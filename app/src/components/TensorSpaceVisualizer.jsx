@@ -74,7 +74,7 @@ const TensorSpaceVisualizer = () => {
       // Initialize the model and then load the sample input for prediction.
       model.init(async function () {
         try {
-          const response = await fetch("/assets/data/coffeepot.json");
+          const response = await fetch("/assets/data/image_topology.json");
           const data = await response.json();
           model.predict(data);
           setPrediction("Prediction Loaded! Check Visualization.");

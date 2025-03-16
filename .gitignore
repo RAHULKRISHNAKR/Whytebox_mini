@@ -54,6 +54,7 @@
 # Python virtual environment (if using any Python scripts)
 venv/
 env/
+env2/
 .env/
 .venv/
 myenv/
