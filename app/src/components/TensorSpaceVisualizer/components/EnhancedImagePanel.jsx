@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
+
+  useEffect(() => {
+    console.log("EnhancedImagePanel isOpen:", isOpen);
+  }, [isOpen]);
 
   // Predefined image slots with metadata
   const imageSlots = [
@@ -9,7 +13,7 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
       id: 1,
       name: "Cat",
       description: "Domestic cat image",
-      thumbnailUrl: "https://placekitten.com/200/200", 
+      thumbnailUrl: "kk.jpg", 
       dataFile: "image_topology.json"
     },
     {
@@ -17,7 +21,7 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
       name: "Dog",
       description: "Canine image",
       thumbnailUrl: "https://placedog.net/200/200",
-      dataFile: "image_topology.json" // Using same file as example, would use different files in real app
+      dataFile: "image_topology.json"
     },
     {
       id: 3,
@@ -54,10 +58,11 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
       
       const data = await response.json();
       
-      // Call the parent component's function with both the image metadata and the data
-      onSelectImage(image, data);
+      // Call the parent component's handler with both the image metadata and data
+      onSelectImage({...image, name: image.name}, data);
     } catch (error) {
       console.error("Error loading image data:", error);
+      alert(`Failed to load image data: ${error.message}`);
     }
   };
 
@@ -67,9 +72,17 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
       style={{ 
         position: "absolute",
         top: 0,
-        left: isOpen ? "0" : "-320px", // Ensure this value is correct
-        zIndex: 10, // Ensure this is higher than other elements
+        left: isOpen ? "0" : "-320px",
+        width: "320px", 
+        height: "100%",
+        backgroundColor: "rgba(32, 33, 36, 0.95)", 
+        color: "#fff",
+        borderRight: "1px solid #3c4043",
+        overflow: "auto",
+        boxShadow: "5px 0 15px rgba(0,0,0,0.3)",
+        zIndex: 20, // Higher z-index to ensure visibility
         transition: "left 0.3s ease",
+        backdropFilter: "blur(10px)"
       }}
     >
       <div style={{ 

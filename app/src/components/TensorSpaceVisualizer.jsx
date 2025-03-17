@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as TSP from "tensorspace";
+import EnhancedImagePanel from "./EnhancedImagePanel"; // Import the component
 
 const TensorSpaceVisualizer = () => {
   const [loading, setLoading] = useState(true);
   const [prediction, setPrediction] = useState(null);
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(true); // Add left sidebar state
   const [activeTab, setActiveTab] = useState('details'); // 'details' or 'list'
   const initCalled = useRef(false);
   const modelRef = useRef(null);
@@ -97,6 +99,45 @@ const TensorSpaceVisualizer = () => {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
     console.log("Sidebar state:", !sidebarOpen);
+  };
+
+  // Handle image selection from the panel
+  const handleImageSelect = async (image, imageData) => {
+    console.log("Selected image:", image.name, "with data:", imageData);
+    
+    if (!modelRef.current) {
+      console.error("Model not initialized yet");
+      return;
+    }
+    
+    try {
+      setLoading(true); // Show loading indicator
+      
+      // Predict with the selected image data
+      modelRef.current.predict(imageData, function (result) {
+        console.log("Prediction with new image completed:", result);
+      
+        // Check if result is a Float32Array or similar
+        if (result instanceof Float32Array || Array.isArray(result)) {
+          // Map probabilities to labels
+          const top5 = Array.from(result)
+            .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
+            .sort((a, b) => b.value - a.value) // Sort by confidence
+            .slice(0, 5) // Get top 5 predictions
+            .map(item => `${item.label}: ${(item.value).toFixed(2)}%`) // Format as "Label: Confidence%"
+            .join(", ");
+      
+          setPrediction(`Top predictions: ${top5}`);
+        } else {
+          setPrediction("Prediction complete! Check visualization.");
+        }
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error("Error predicting with selected image:", error);
+      setPrediction("Error processing image: " + error.message);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -415,16 +456,50 @@ const TensorSpaceVisualizer = () => {
       backgroundColor: "#121212",
       fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif"
     }}>
-      {/* Main canvas - maximized */}
+      {/* Main canvas - adjust width to accommodate left sidebar when open */}
       <div id="container" style={{ 
         width: "100%", 
         height: "100%",
         position: "absolute",
         top: 0,
-        left: 0
+        left: leftSidebarOpen ? "350px" : 0,
+        transition: "left 0.3s ease",
+        right: sidebarOpen ? "350px" : 0,
       }}></div>
       
-      {/* Toggle sidebar button */}
+      {/* Left sidebar toggle button */}
+      <button 
+        onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+        style={{
+          position: "absolute",
+          top: "20px",
+          left: leftSidebarOpen ? "370px" : "20px",
+          backgroundColor: "rgba(76, 175, 80, 0.9)",
+          color: "white",
+          border: "none",
+          borderRadius: "50%",
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          cursor: "pointer",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+          zIndex: 10,
+          transition: "left 0.3s ease",
+          fontSize: "20px"
+        }}
+      >
+        {leftSidebarOpen ? "←" : "→"}
+      </button>
+      
+      {/* EnhancedImagePanel as left sidebar */}
+      <EnhancedImagePanel 
+        isOpen={leftSidebarOpen} 
+        onSelectImage={handleImageSelect} 
+      />
+      
+      {/* Toggle right sidebar button */}
       <button 
         onClick={toggleSidebar}
         style={{

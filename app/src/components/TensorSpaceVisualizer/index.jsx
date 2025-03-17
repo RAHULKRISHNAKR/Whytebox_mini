@@ -3,7 +3,8 @@ import * as TSP from "tensorspace";
 import SidebarPanel from "./components/SidebarPanel";
 import LoadingOverlay from "./components/LoadingOverlay";
 import PredictionBar from "./components/PredictionBar";
-import ImageSelectorPanel from "./components/ImageSelectorPanel";
+// Import our new EnhancedImagePanel component
+import EnhancedImagePanel from "./components/EnhancedImagePanel";
 
 const TensorSpaceVisualizer = () => {
   const [loading, setLoading] = useState(true);
@@ -11,8 +12,8 @@ const TensorSpaceVisualizer = () => {
   const [topPrediction, setTopPrediction] = useState(null);
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  // Set leftSidebarOpen to true by default to make it visible initially
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('details'); // 'details' or 'list'
   const initCalled = useRef(false);
   const modelRef = useRef(null);
@@ -112,26 +113,18 @@ const TensorSpaceVisualizer = () => {
     console.log("Left sidebar state:", !leftSidebarOpen);
   };
 
-  // Function to handle image selection
-  const handleImageSelect = async (image) => {
-    setSelectedImage(image);
-    console.log("Selected image:", image);
+  // Modified image selection handler to accept data directly
+  const handleImageSelect = async (image, imageData) => {
+    console.log("Selected image:", image.name, "with data:", imageData);
     
     if (!modelRef.current) return;
     
     setLoading(true);
-    setPrediction("Processing new image...");
+    setPrediction(`Processing ${image.name}...`);
     
     try {
-      // Fetch the image data - in a real app, this would be the actual image data
-      const response = await fetch("/assets/data/image_topology.json");
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image data: ${response.status} ${response.statusText}`);
-      }
-      const data = await response.json();
-      
-      // Run prediction with the new image data
-      modelRef.current.predict(data, function (result) {
+      // Use the provided data directly
+      modelRef.current.predict(imageData, function (result) {
         console.log("New prediction completed:", result);
         
         if (result instanceof Float32Array || Array.isArray(result)) {
@@ -317,7 +310,7 @@ const TensorSpaceVisualizer = () => {
         position: "absolute",
         top: 0,
         left: 0,
-        paddingLeft: leftSidebarOpen ? "300px" : "0",
+        paddingLeft: leftSidebarOpen ? "320px" : "0", // Adjusted for panel width
         paddingRight: sidebarOpen ? "350px" : "0",
         transition: "padding 0.3s ease"
       }}></div>
@@ -328,7 +321,7 @@ const TensorSpaceVisualizer = () => {
         style={{
           position: "absolute",
           top: "20px",
-          left: leftSidebarOpen ? "310px" : "20px",
+          left: leftSidebarOpen ? "330px" : "20px", // Adjusted for panel width
           backgroundColor: "rgba(66, 133, 244, 0.9)",
           color: "white",
           border: "none",
@@ -340,7 +333,7 @@ const TensorSpaceVisualizer = () => {
           alignItems: "center",
           cursor: "pointer",
           boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-          zIndex: 10,
+          zIndex: 25, // Higher z-index to remain above panel
           transition: "left 0.3s ease",
           fontSize: "20px"
         }}
@@ -374,9 +367,9 @@ const TensorSpaceVisualizer = () => {
         {sidebarOpen ? "→" : "←"}
       </button>
       
-      {/* Image Selector Panel (Left) */}
-      <ImageSelectorPanel 
-        isOpen={leftSidebarOpen} 
+      {/* Use our new EnhancedImagePanel instead of ImageSelectorPanel */}
+      <EnhancedImagePanel 
+        isOpen={leftSidebarOpen} // Ensure this is true to make the panel visible
         onSelectImage={handleImageSelect} 
       />
 
