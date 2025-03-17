@@ -3,7 +3,7 @@ import numpy as np
 import json
 
 # Load image as BGR (OpenCV loads as BGR by default)
-img = cv2.imread("image.png")
+img = cv2.imread("C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/zsample/cat.png")
 
 # Resize to 224x224
 img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)  # Resize while keeping quality
@@ -22,7 +22,7 @@ img = np.expand_dims(img, axis=0)
 flat_data = [round(float(value)) if value.is_integer() else float(value) for value in img.flatten()]
 
 # Save to JSON file
-with open("image_topology.json", "w") as f:
+with open("image_topology_cat.json", "w") as f:
     json.dump(flat_data, f, separators=(',', ':'))
 
 print("JSON file saved successfully!")
