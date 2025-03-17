@@ -297,8 +297,8 @@ const TensorSpaceVisualizer = () => {
   return (
     <div className="visualizer-container" style={{ 
       position: "relative", 
-      width: "100vw", 
-      height: "100vh", 
+      width: "100px", 
+      height: "100%", 
       overflow: "hidden",
       backgroundColor: "#121212",
       fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif"
