@@ -44,12 +44,16 @@ output_data = {
 }
 
 for layer_name, feature_map in zip(selected_layer_names, feature_maps):
+    layer = model.get_layer(layer_name)
     feature_map_img = feature_map[0, :, :, 0]  # First channel for visualization
     feature_map_img = (feature_map_img - feature_map_img.min()) / (feature_map_img.max() - feature_map_img.min())
     feature_map_img = (feature_map_img * 255).astype('uint8')
     output_data["layers"].append({
         "layer_name": layer_name,
-        "feature_map": encode_image(feature_map_img)
+        "feature_map": encode_image(feature_map_img),
+        "type": layer.__class__.__name__,  # Layer type (e.g., Conv2D, DepthwiseConv2D)
+        "filters": getattr(layer, "filters", None),  # Number of filters (if applicable)
+        "kernel_size": getattr(layer, "kernel_size", None)  # Kernel size (if applicable)
     })
 
 # Add predictions
@@ -60,3 +64,5 @@ output_data["predictions"] = [
 # Save JSON file
 with open("layer_data.json", "w") as f:
     json.dump(output_data, f, indent=4)
+
+print("JSON file saved as layer_data.json")

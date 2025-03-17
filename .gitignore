@@ -69,3 +69,5 @@ myenv/
 **/*.debug.*
 
 ./gen_req.py
+
+kk.jpg

@@ -37,8 +37,6 @@ def install_tfjs():
 def install_pb2json():
     path_now = os.getcwd()
     os.chdir(pb2json_workspace)
-    subprocess.check_call([
-        "npm",
-        "install"
-    ])
+    subprocess.run(["powershell", "-Command", "npm install"], capture_output=True)
+
     os.chdir(path_now)

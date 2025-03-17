@@ -4,6 +4,7 @@ import layerData from "../assets/layer_data.json";
 
 const LayerVisualizer = () => {
   const [data] = useState(layerData);
+  console.log("Loaded layer data:", data);
 
   const buildLayerTree = (layers, predictions) => {
     if (layers.length === 0) {
@@ -18,6 +19,11 @@ const LayerVisualizer = () => {
       name: currentLayer.layer_name,
       image: currentLayer.feature_map,
       type: "layer",
+      layerInfo: {
+        type: currentLayer.type,
+        filters: currentLayer.filters,
+        kernelSize: currentLayer.kernel_size,
+      },
       children: [buildLayerTree(restLayers, predictions)],
     };
   };
@@ -32,15 +38,15 @@ const LayerVisualizer = () => {
   const renderCustomNode = ({ nodeDatum }) => {
     if (nodeDatum.type === "input" || nodeDatum.type === "layer") {
       return (
-        <foreignObject width={180} height={180}>
-          <div style={{ width: "180px", height: "180px", position: "relative" }}>
+        <foreignObject width={200} height={200}>
+          <div style={{ width: "200px", height: "200px", position: "relative" }}>
             <img
               src={`data:image/png;base64,${nodeDatum.image}`}
               alt={nodeDatum.name}
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "contain", // Keeps aspect ratio
+                objectFit: "contain",
                 borderRadius: "8px",
                 border: "1px solid #ddd",
               }}
@@ -61,54 +67,74 @@ const LayerVisualizer = () => {
             >
               {nodeDatum.name}
             </p>
+            {nodeDatum.layerInfo && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "5px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(255, 255, 255, 0.9)",
+                  padding: "5px",
+                  borderRadius: "5px",
+                  fontSize: "12px",
+                  textAlign: "center",
+                  boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
+                }}
+              >
+                <p>Type: {nodeDatum.layerInfo.type}</p>
+                <p>Filters: {nodeDatum.layerInfo.filters}</p>
+                <p>Kernel: {nodeDatum.layerInfo.kernelSize?.join("x")}</p>
+              </div>
+            )}
           </div>
         </foreignObject>
       );
     } else if (nodeDatum.type === "predictions") {
-        return (
-            <foreignObject width={250} height={nodeDatum.predictions.length * 25 + 50}>
-              <div
-                style={{
-                  width: "auto",
-                  padding: "10px",
-                  background: "#ffffff",
-                  borderRadius: "8px",
-                  border: "1px solid #ddd",
-                  textAlign: "center",
-                  boxShadow: "2px 2px 10px rgba(0,0,0,0.1)",
-                  overflow: "visible",
-                }}
-              >
-                <h2
+      return (
+        <foreignObject width={250} height={nodeDatum.predictions.length * 25 + 50}>
+          <div
+            style={{
+              width: "auto",
+              padding: "10px",
+              background: "#ffffff",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              textAlign: "center",
+              boxShadow: "2px 2px 10px rgba(0,0,0,0.1)",
+              overflow: "visible",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "14px",
+                fontWeight: "bold",
+                marginBottom: "5px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Predictions:
+            </h2>
+            <div style={{ maxHeight: "150px", overflowY: "auto" }}>
+              {nodeDatum.predictions.map((pred, index) => (
+                <p
+                  key={index}
                   style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    marginBottom: "5px",
-                    whiteSpace: "nowrap",
+                    fontSize: "12px",
+                    fontWeight: index === 0 ? "bold" : "normal",
+                    color: index === 0 ? "green" : "gray",
+                    margin: "4px 0",
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
                   }}
                 >
-                  Predictions:
-                </h2>
-                <div style={{ maxHeight: "150px", overflowY: "auto" }}>
-                  {nodeDatum.predictions.map((pred, index) => (
-                    <p
-                      key={index}
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: index === 0 ? "bold" : "normal",
-                        color: index === 0 ? "green" : "gray",
-                        margin: "4px 0",
-                        whiteSpace: "normal", // Allow text wrapping
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {pred.class} ({(pred.probability * 100).toFixed(2)}%)
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </foreignObject>
-          );
+                  {pred.class} ({(pred.probability * 100).toFixed(2)}%)
+                </p>
+              ))}
+            </div>
+          </div>
+        </foreignObject>
+      );
     }
   };
 

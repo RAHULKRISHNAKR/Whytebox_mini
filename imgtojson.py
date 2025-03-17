@@ -3,7 +3,7 @@ import numpy as np
 import json
 
 # Load image as BGR (OpenCV loads as BGR by default)
-img = cv2.imread("1.jpg")
+img = cv2.imread("image.png")
 
 # Resize to 224x224
 img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)  # Resize while keeping quality

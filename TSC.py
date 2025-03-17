@@ -30,7 +30,7 @@ def main():
 
     # Build the conversion command
     conversion_command = [
-        "D:\Projects\Personal\GitHub\Whytebox2.0\.venv\Scripts\\tensorspace_converter.exe",
+        "C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/myenv/Scripts/tensorspace_converter.exe",
         "--input_model_from=tensorflow",
         "--input_model_format=tf_keras",
         "--output_layer_names=conv1,conv_dw_1,conv_pw_1,conv_dw_2,conv_pw_2,conv_dw_3,conv_pw_3,conv_dw_4,conv_pw_4,conv_dw_5,conv_pw_5,conv_dw_6,conv_pw_6,conv_dw_7,conv_pw_7,conv_dw_8,conv_pw_8,conv_dw_9,conv_pw_9,conv_dw_10,conv_pw_10,conv_dw_11,conv_pw_11,conv_dw_12,conv_pw_12,conv_dw_13,conv_pw_13,conv_preds",
