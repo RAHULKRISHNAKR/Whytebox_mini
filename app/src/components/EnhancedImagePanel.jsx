@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * EnhancedImagePanel component for selecting and preprocessing images
@@ -14,13 +14,13 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
   useEffect(() => {
     const fetchSampleImages = async () => {
       try {
-        // This would typically fetch from an API or local directory
-        // For now we'll use placeholder sample images
+        // Using public image URLs from the internet without JSON file paths
         const sampleImages = [
-          { id: 1, name: 'Cat', path: '/assets/samples/cat.jpg', thumbnail: '/assets/samples/thumbnails/cat.jpg' },
-          { id: 2, name: 'Dog', path: '/assets/samples/dog.jpg', thumbnail: '/assets/samples/thumbnails/dog.jpg' },
-          { id: 3, name: 'Bird', path: '/assets/samples/bird.jpg', thumbnail: '/assets/samples/thumbnails/bird.jpg' },
-          { id: 4, name: 'Car', path: '/assets/samples/car.jpg', thumbnail: '/assets/samples/thumbnails/car.jpg' },
+          { id: 1, name: 'Cat', path: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba', thumbnail: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300' },
+          { id: 2, name: 'Dog', path: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1', thumbnail: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=300' },
+          { id: 3, name: 'Bird', path: 'https://images.unsplash.com/photo-1444464666168-49d633b86797', thumbnail: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=300' },
+          { id: 4, name: 'Car', path: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf', thumbnail: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300' },
+          { id: 5, name: 'Coffeepot', path:'https://plus.unsplash.com/premium_photo-1674327105280-b86494dfc690', thumbnail:'https://plus.unsplash.com/premium_photo-1674327105280-b86494dfc690?auto=format&fit=crop&w=300' }
         ];
         
         setImages(sampleImages);
@@ -34,37 +34,20 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
     fetchSampleImages();
   }, []);
   
-  // Handle image click - process it for the model
-  const handleImageClick = async (image) => {
-    try {
-      setSelectedImage(image);
-      setIsLoading(true);
-      
-      // In a real app, this would preprocess the image for your model
-      // Here we're simulating loading the image data
-      const response = await fetch('/assets/data/image_topology.json');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch sample data: ${response.status}`);
-      }
-      const imageData = await response.json();
-      
-      // Pass the selected image and its processed data to parent
-      onSelectImage(image, imageData);
-      
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error processing image:', error);
-      setIsLoading(false);
-    }
+  // Handle image click - simplified to just pass the image to parent
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+    // Simply pass the selected image to parent, no fetching here
+    onSelectImage(image);
   };
   
-  // Handle file upload
+  // Handle file upload - simplified
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
     
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.onload = (e) => {
       const imageObj = {
         id: Date.now(),
         name: file.name,
@@ -74,25 +57,8 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
       };
       
       setSelectedImage(imageObj);
-      
-      // In a real app, you would preprocess the uploaded image here
-      // For demo, we'll use the same sample data
-      try {
-        setIsLoading(true);
-        const response = await fetch('/assets/data/image_topology.json');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch sample data: ${response.status}`);
-        }
-        const imageData = await response.json();
-        
-        // Pass the uploaded image and its processed data to parent
-        onSelectImage(imageObj, imageData);
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error processing uploaded image:', error);
-        setIsLoading(false);
-      }
+      // Pass the uploaded image to parent
+      onSelectImage(imageObj);
     };
     
     reader.readAsDataURL(file);

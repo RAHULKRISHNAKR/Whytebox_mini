@@ -101,9 +101,9 @@ const TensorSpaceVisualizer = () => {
     console.log("Sidebar state:", !sidebarOpen);
   };
 
-  // Handle image selection from the panel
-  const handleImageSelect = async (image, imageData) => {
-    console.log("Selected image:", image.name, "with data:", imageData);
+  // Handle image selection from the panel - now includes JSON fetching
+  const handleImageSelect = async (image) => {
+    console.log("Selected image:", image.name);
     
     if (!modelRef.current) {
       console.error("Model not initialized yet");
@@ -113,7 +113,37 @@ const TensorSpaceVisualizer = () => {
     try {
       setLoading(true); // Show loading indicator
       
-      // Predict with the selected image data
+      // Hardcoded mapping of image names to JSON files
+      let jsonFilePath;
+      switch(image.name) {
+        case 'Cat':
+          jsonFilePath = '/assets/data/cat_topology.json';
+          break;
+        case 'Dog':
+          jsonFilePath = '/assets/data/dog_topology.json';
+          break;
+        case 'Bird':
+          jsonFilePath = '/assets/data/bird_topology.json';
+          break;
+        case 'Car':
+          jsonFilePath = '/assets/data/car_topology.json';
+          break;
+        case 'Coffeepot':
+          jsonFilePath = '/assets/data/coffeepot_topology.json';
+          break;
+        default:
+          // Default fallback for uploaded images or unknown types
+          jsonFilePath = '/assets/data/image_topology.json';
+      }
+      
+      // Fetch the specific JSON topology file for this image
+      const response = await fetch(jsonFilePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image data: ${response.status}`);
+      }
+      const imageData = await response.json();
+      
+      // Predict with the fetched image data
       modelRef.current.predict(imageData, function (result) {
         console.log("Prediction with new image completed:", result);
       
@@ -331,7 +361,7 @@ const TensorSpaceVisualizer = () => {
         url: "/assets/models/mobilenetv1/model.json",
       });
 
-      // Initialize the model and then load the sample input for prediction
+      // Initialize the model and load the default image_topology.json
       model.init(async function () {
         try {
           console.log("Model initialized successfully!");
@@ -339,43 +369,48 @@ const TensorSpaceVisualizer = () => {
           // After initialization, bind click events
           bindLayerClickEvents();
           
-          const response = await fetch("/assets/data/image_topology.json");
-          if (!response.ok) {
-            throw new Error(`Failed to fetch image data: ${response.status} ${response.statusText}`);
-          }
-          const data = await response.json();
-          console.log("Sample data loaded:", data);
-          
-          // Fix the predict method call - TensorSpace expects a direct callback function,
-          // not an object with successCallback
-          model.predict(data, function (result) {
-            console.log("Prediction completed:", result);
-          
-            // Check if result is a Float32Array or similar
-            if (result instanceof Float32Array || Array.isArray(result)) {
-              // Map probabilities to labels
-              const top5 = Array.from(result)
-                .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
-                .sort((a, b) => b.value - a.value) // Sort by confidence
-                .slice(0, 5) // Get top 5 predictions
-                .map(item => `${item.label}: ${(item.value).toFixed(2)}%`) // Format as "Label: Confidence%"
-                .join(", ");
-          
-              setPrediction(`Top predictions: ${top5}`);
-            } else {
-              setPrediction("Prediction complete! Check visualization.");
+          // Load default image_topology.json
+          try {
+            setLoading(true);
+            const response = await fetch("/assets/data/image_topology.json");
+            if (!response.ok) {
+              throw new Error(`Failed to fetch default image data: ${response.status}`);
             }
-          });
+            const imageData = await response.json();
+            
+            // Predict with the default image data
+            model.predict(imageData, function (result) {
+              console.log("Default prediction completed:", result);
+            
+              // Check if result is a Float32Array or similar
+              if (result instanceof Float32Array || Array.isArray(result)) {
+                // Map probabilities to labels
+                const top5 = Array.from(result)
+                  .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
+                  .sort((a, b) => b.value - a.value) // Sort by confidence
+                  .slice(0, 5) // Get top 5 predictions
+                  .map(item => `${item.label}: ${(item.value).toFixed(2)}%`) // Format as "Label: Confidence%"
+                  .join(", ");
+            
+                setPrediction(`Top predictions: ${top5}`);
+              } else {
+                setPrediction("Default visualization loaded. Select an image to see different results.");
+              }
+              setLoading(false);
+            });
+          } catch (error) {
+            console.error("Error loading default image data:", error);
+            setPrediction("Error loading default visualization. Please select an image.");
+            setLoading(false);
+          }
           
-          // Set animation options separately if needed
+          // Set animation options
           if (model.setAnimationTimeRatio) {
             model.setAnimationTimeRatio(0.8);
           }
-          
-          setLoading(false);
         } catch (error) {
-          console.error("Error fetching sample input:", error);
-          setPrediction("Error loading prediction data: " + error.message);
+          console.error("Error during model initialization:", error);
+          setPrediction("Error initializing model: " + error.message);
           setLoading(false);
         }
       });
@@ -506,7 +541,7 @@ const TensorSpaceVisualizer = () => {
         {leftSidebarOpen ? "←" : "→"}
       </button>
       
-      {/* EnhancedImagePanel as left sidebar */}
+      {/* EnhancedImagePanel as left sidebar - now with simplified onSelectImage */}
       <EnhancedImagePanel 
         isOpen={leftSidebarOpen} 
         onSelectImage={handleImageSelect} 
