@@ -297,22 +297,22 @@ const TensorSpaceVisualizer = () => {
   return (
     <div className="visualizer-container" style={{ 
       position: "relative", 
-      width: "100px", 
-      height: "100%", 
+      width: "100%", 
+      height: "100vh", 
       overflow: "hidden",
       backgroundColor: "#121212",
       fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif"
     }}>
       {/* Main canvas - positioned between sidebars */}
       <div id="container" style={{ 
-        width: "100%", 
+        width: leftSidebarOpen ? "45%" : "100%", 
         height: "100%",
         position: "absolute",
         top: 0,
         left: 0,
         paddingLeft: leftSidebarOpen ? "320px" : "0", // Adjusted for panel width
         paddingRight: sidebarOpen ? "350px" : "0",
-        transition: "padding 0.3s ease"
+        transition: "width 0.3s ease ,padding 0.3s ease"
       }}></div>
       
       {/* Left sidebar toggle button */}

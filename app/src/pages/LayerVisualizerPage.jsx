@@ -7,11 +7,6 @@ function LayerVisualizerPage() {
 
   return (
     <div className="layer-visualizer-container">
-      <header className="visualizer-header">
-        <h1>Neural Network Layer Visualization</h1>
-        <p className="header-description">Interactive 3D visualization of neural network architecture</p>
-      </header>
-      
       <main className="visualizer-content">
         <div className="visualizer-wrapper">
           <TensorSpaceVisualizer />

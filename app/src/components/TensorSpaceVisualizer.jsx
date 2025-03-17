@@ -407,6 +407,19 @@ const TensorSpaceVisualizer = () => {
     init();
   }, []);
 
+  // Add this function before the return statement in the component
+  const getLayerExplanation = (layerType) => {
+    const explanations = {
+      'RGBInput': 'Accepts RGB image data as input with three channels (Red, Green, Blue). This is the starting point of the neural network where raw pixel data enters the model.',
+      'Conv2d': 'Convolutional 2D layer that applies learnable filters to the input to extract features. These filters scan the input data to detect patterns like edges, textures, or shapes.',
+      'DepthwiseConv2d': 'A specialized convolution that processes each input channel separately using a single filter per channel. This reduces computation while still capturing spatial patterns.',
+      'GlobalPooling2d': 'Reduces the spatial dimensions by taking the average of all values in each feature map. This converts a 3D tensor to a 1D feature vector suitable for final classification.',
+      'Output1d': 'The final layer that outputs the classification predictions. Values represent the probability scores for each possible class.'
+    };
+
+    return explanations[layerType] || 'Processes input data through trainable parameters to extract or transform features in the neural network.';
+  };
+
   const renderSidebarLayers = () => {
     if (!modelRef.current || !modelRef.current.layers) {
       console.log("No layers available in model reference");
@@ -450,7 +463,7 @@ const TensorSpaceVisualizer = () => {
   return (
     <div className="visualizer-container" style={{ 
       position: "relative", 
-      width: "100vw", 
+      width: "100%", 
       height: "100vh", 
       overflow: "hidden",
       backgroundColor: "#121212",
@@ -458,12 +471,12 @@ const TensorSpaceVisualizer = () => {
     }}>
       {/* Main canvas - adjust width to accommodate left sidebar when open */}
       <div id="container" style={{ 
-        width: "100%", 
+        width:  leftSidebarOpen ? "70%" : "100%",
         height: "100%",
         position: "absolute",
         top: 0,
         left: leftSidebarOpen ? "350px" : 0,
-        transition: "left 0.3s ease",
+        transition: "width 0.3s ease, left 0.3s ease",
         right: sidebarOpen ? "350px" : 0,
       }}></div>
       
@@ -620,6 +633,31 @@ const TensorSpaceVisualizer = () => {
                     }}>
                       {selectedLayer.type}
                     </span>
+                  </div>
+                  
+                  {/* Add explanation section */}
+                  <div style={{
+                    backgroundColor: "#f1f8ff", 
+                    padding: "15px", 
+                    borderRadius: "10px",
+                    marginBottom: "15px",
+                    border: "1px solid #d0e3ff"
+                  }}>
+                    <h4 style={{ 
+                      margin: "0 0 10px", 
+                      fontSize: "0.95rem", 
+                      color: "#4285f4",
+                      display: "flex",
+                      alignItems: "center"
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: "6px" }} fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z" fill="#4285f4"/>
+                      </svg>
+                      Layer Function
+                    </h4>
+                    <p style={{ margin: "0", fontSize: "0.9rem", color: "#5f6368", lineHeight: "1.5" }}>
+                      {getLayerExplanation(selectedLayer.type)}
+                    </p>
                   </div>
                   
                   <div style={{
