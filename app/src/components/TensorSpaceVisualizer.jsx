@@ -117,19 +117,19 @@ const TensorSpaceVisualizer = () => {
       let jsonFilePath;
       switch(image.name) {
         case 'Cat':
-          jsonFilePath = '/assets/data/cat_topology.json';
+            jsonFilePath = "/public/assets/data/cat.json";
           break;
         case 'Dog':
-          jsonFilePath = '/assets/data/dog_topology.json';
+          jsonFilePath = '/public/assets/data/dog.json';
           break;
         case 'Bird':
-          jsonFilePath = '/assets/data/bird_topology.json';
+          jsonFilePath = '/public/assets/data/bird.json';
           break;
         case 'Car':
-          jsonFilePath = '/assets/data/car_topology.json';
+          jsonFilePath = '/public/assets/data/car.json';
           break;
         case 'Coffeepot':
-          jsonFilePath = '/assets/data/coffeepot_topology.json';
+          jsonFilePath = '/public/assets/data/coffeepot.json';
           break;
         default:
           // Default fallback for uploaded images or unknown types
