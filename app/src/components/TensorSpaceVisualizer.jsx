@@ -12,6 +12,7 @@ const TensorSpaceVisualizer = () => {
   const [activeTab, setActiveTab] = useState('details');
   // Replace animation states with just what we need for the component interaction
   const [showAnimationControls, setShowAnimationControls] = useState(false);
+  const [animationSpeed, setAnimationSpeed] = useState(1);
   const initCalled = useRef(false);
   const modelRef = useRef(null);
   const outputLabels = window.result 
@@ -176,7 +177,7 @@ const TensorSpaceVisualizer = () => {
         .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
         .sort((a, b) => b.value - a.value) // Sort by confidence
         .slice(0, 5) // Get top 5 predictions
-        .map(item => `${item.label}: ${(item.value * 100).toFixed(2)}%`) // Format as "Label: Confidence%"
+        .map(item => `${item.label}: ${(item.value).toFixed(2)}%`) // Format as "Label: Confidence%"
         .join(", ");
       
       setPrediction(`Top predictions: ${top5}`);
@@ -381,6 +382,11 @@ const TensorSpaceVisualizer = () => {
       model.init(async function () {
         try {
           console.log("Model initialized successfully!");
+          
+          // Set initial animation speed
+          if (model.setAnimationTimeRatio) {
+            model.setAnimationTimeRatio(animationSpeed);
+          }
           
           // After initialization, bind click events
           bindLayerClickEvents();
@@ -972,7 +978,48 @@ const TensorSpaceVisualizer = () => {
         isVisible={showAnimationControls} 
         onAnimationComplete={handleAnimationComplete}
         getLayerExplanation={getLayerExplanation}
+        animationSpeed={animationSpeed} // Add this prop
       />
+
+      {/* Add this component right after the NetworkAnimation component */}
+      {showAnimationControls && (
+        <div style={{
+          position: 'fixed',
+          bottom: '120px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          padding: '15px 25px',
+          borderRadius: '30px',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <label style={{ color: 'white', fontSize: '0.9em' }}>
+            Speed: {animationSpeed.toFixed(1)}x
+          </label>
+          <input
+            type="range"
+            min="0.1"
+            max="2.0"
+            step="0.1"
+            value={animationSpeed}
+            onChange={(e) => {
+              const newSpeed = parseFloat(e.target.value);
+              setAnimationSpeed(newSpeed);
+              if (modelRef.current && modelRef.current.setAnimationTimeRatio) {
+                modelRef.current.setAnimationTimeRatio(newSpeed);
+              }
+            }}
+            style={{
+              width: '150px',
+              accentColor: '#4285f4'
+            }}
+          />
+        </div>
+      )}
 
       {/* Add global styles for animations with matching class names */}
       <style dangerouslySetInnerHTML={{
@@ -1038,6 +1085,34 @@ const TensorSpaceVisualizer = () => {
           .network-animation-progress,
           .layer-info-tooltip {
             z-index: 1000;
+          }
+
+          input[type="range"] {
+            -webkit-appearance: none;
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            background-image: linear-gradient(#4285f4, #4285f4);
+            background-repeat: no-repeat;
+          }
+
+          input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            background: #4285f4;
+            cursor: pointer;
+            box-shadow: 0 0 2px 0 #555;
+            transition: background .3s ease-in-out;
+          }
+
+          input[type="range"]::-webkit-slider-thumb:hover {
+            background: #5c9fff;
+          }
+
+          .animation-controls {
+            transition: opacity 0.3s ease;
           }
         `
       }} />
