@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as TSP from "tensorspace";
 import EnhancedImagePanel from "./EnhancedImagePanel"; 
-import NetworkAnimation from "./TensorSpaceVisualizer/components/NetworkAnimation";
+import NetworkAnimation from "./NetworkAnimation";
 
 const TensorSpaceVisualizer = () => {
   const [loading, setLoading] = useState(true);
@@ -980,46 +980,6 @@ const TensorSpaceVisualizer = () => {
         getLayerExplanation={getLayerExplanation}
         animationSpeed={animationSpeed} // Add this prop
       />
-
-      {/* Add this component right after the NetworkAnimation component */}
-      {showAnimationControls && (
-        <div style={{
-          position: 'fixed',
-          bottom: '120px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          padding: '15px 25px',
-          borderRadius: '30px',
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <label style={{ color: 'white', fontSize: '0.9em' }}>
-            Speed: {animationSpeed.toFixed(1)}x
-          </label>
-          <input
-            type="range"
-            min="0.1"
-            max="2.0"
-            step="0.1"
-            value={animationSpeed}
-            onChange={(e) => {
-              const newSpeed = parseFloat(e.target.value);
-              setAnimationSpeed(newSpeed);
-              if (modelRef.current && modelRef.current.setAnimationTimeRatio) {
-                modelRef.current.setAnimationTimeRatio(newSpeed);
-              }
-            }}
-            style={{
-              width: '150px',
-              accentColor: '#4285f4'
-            }}
-          />
-        </div>
-      )}
 
       {/* Add global styles for animations with matching class names */}
       <style dangerouslySetInnerHTML={{

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../../styles/TensorVisualizer.css';
 
 const ImageSelectorPanel = ({ isOpen, onSelectImage }) => {
+  const [selectedImage, setSelectedImage] = useState(null);
+
   // Sample images for demonstration
   const sampleImages = [
     { id: 1, name: "Cat", path: "/assets/images/cat.jpg", category: "Animal" },
@@ -20,6 +22,11 @@ const ImageSelectorPanel = ({ isOpen, onSelectImage }) => {
     acc[img.category].push(img);
     return acc;
   }, {});
+
+  const handleImageSelect = (image) => {
+    setSelectedImage(image);
+    onSelectImage(image);
+  };
 
   return (
     <div 
@@ -83,7 +90,7 @@ const ImageSelectorPanel = ({ isOpen, onSelectImage }) => {
               {images.map(image => (
                 <div 
                   key={image.id}
-                  onClick={() => onSelectImage(image)}
+                  onClick={() => handleImageSelect(image)}
                   style={{
                     borderRadius: "8px",
                     overflow: "hidden",
@@ -143,6 +150,32 @@ const ImageSelectorPanel = ({ isOpen, onSelectImage }) => {
           </button>
         </div>
       </div>
+
+      {selectedImage && (
+        <div style={{ 
+          textAlign: "center", 
+          marginTop: "20px",
+          padding: "15px",
+          borderTop: "1px solid #eaeaea"
+        }}>
+          <h4 style={{ 
+            fontSize: "1rem", 
+            color: "#202124", 
+            marginBottom: "10px"
+          }}>
+            Grad-CAM Visualization
+          </h4>
+          <img 
+            src={`${selectedImage.path.replace('.jpg', '_GC.jpg')}`} 
+            alt={`${selectedImage.name} Grad-CAM`}
+            style={{
+              maxWidth: "100%",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
