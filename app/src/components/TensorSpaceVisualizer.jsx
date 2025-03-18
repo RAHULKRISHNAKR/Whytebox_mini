@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as TSP from "tensorspace";
-import EnhancedImagePanel from "./EnhancedImagePanel"; // Import the component
+import EnhancedImagePanel from "./EnhancedImagePanel"; 
+import NetworkAnimation from "./TensorSpaceVisualizer/components/NetworkAnimation";
 
 const TensorSpaceVisualizer = () => {
   const [loading, setLoading] = useState(true);
   const [prediction, setPrediction] = useState(null);
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false); // Add left sidebar state
-  const [activeTab, setActiveTab] = useState('details'); // 'details' or 'list'
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false); 
+  const [activeTab, setActiveTab] = useState('details');
+  // Replace animation states with just what we need for the component interaction
+  const [showAnimationControls, setShowAnimationControls] = useState(false);
   const initCalled = useRef(false);
   const modelRef = useRef(null);
   const outputLabels = window.result 
@@ -101,7 +104,7 @@ const TensorSpaceVisualizer = () => {
     console.log("Sidebar state:", !sidebarOpen);
   };
 
-  // Handle image selection from the panel - now includes JSON fetching
+  // Simplified handleImageSelect with animation controls
   const handleImageSelect = async (image) => {
     console.log("Selected image:", image.name);
     
@@ -111,13 +114,15 @@ const TensorSpaceVisualizer = () => {
     }
     
     try {
-      setLoading(true); // Show loading indicator
+      setLoading(true);
+      setPrediction(null); // Clear previous prediction
+      setShowAnimationControls(false); // Hide animation controls while loading
       
       // Hardcoded mapping of image names to JSON files
       let jsonFilePath;
       switch(image.name) {
         case 'Cat':
-            jsonFilePath = "/assets/data/cat.json";
+          jsonFilePath = "/assets/data/cat.json";
           break;
         case 'Dog':
           jsonFilePath = '/assets/data/dog.json';
@@ -132,41 +137,51 @@ const TensorSpaceVisualizer = () => {
           jsonFilePath = '/assets/data/coffeepot.json';
           break;
         default:
-          // Default fallback for uploaded images or unknown types
           jsonFilePath = '/assets/data/image_topology.json';
       }
       
-      // Fetch the specific JSON topology file for this image
       const response = await fetch(jsonFilePath);
       if (!response.ok) {
         throw new Error(`Failed to fetch image data: ${response.status}`);
       }
       const imageData = await response.json();
       
-      // Predict with the fetched image data
-      modelRef.current.predict(imageData, function (result) {
-        console.log("Prediction with new image completed:", result);
+      setLoading(false);
       
-        // Check if result is a Float32Array or similar
-        if (result instanceof Float32Array || Array.isArray(result)) {
-          // Map probabilities to labels
-          const top5 = Array.from(result)
-            .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
-            .sort((a, b) => b.value - a.value) // Sort by confidence
-            .slice(0, 5) // Get top 5 predictions
-            .map(item => `${item.label}: ${(item.value).toFixed(2)}%`) // Format as "Label: Confidence%"
-            .join(", ");
-      
-          setPrediction(`Top predictions: ${top5}`);
-        } else {
-          setPrediction("Prediction complete! Check visualization.");
-        }
-        setLoading(false);
+      // Predict with the fetched image data (storing result for the animation to use)
+      modelRef.current.predict(imageData, function(result) {
+        window.currentPredictionResult = result;
+        
+        // Show animation controls after prediction is ready
+        setTimeout(() => {
+          setShowAnimationControls(true); // Show animation controls after a slight delay
+        }, 300);
       });
     } catch (error) {
       console.error("Error predicting with selected image:", error);
       setPrediction("Error processing image: " + error.message);
       setLoading(false);
+      setShowAnimationControls(false);
+    }
+  };
+
+  // Handler for when animation completes
+  const handleAnimationComplete = () => {
+    // Access the prediction result saved during prediction
+    const result = window.currentPredictionResult;
+    
+    if (result instanceof Float32Array || Array.isArray(result)) {
+      // Map probabilities to labels
+      const top5 = Array.from(result)
+        .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
+        .sort((a, b) => b.value - a.value) // Sort by confidence
+        .slice(0, 5) // Get top 5 predictions
+        .map(item => `${item.label}: ${(item.value * 100).toFixed(2)}%`) // Format as "Label: Confidence%"
+        .join(", ");
+      
+      setPrediction(`Top predictions: ${top5}`);
+    } else {
+      setPrediction("Prediction complete! Check visualization.");
     }
   };
 
@@ -185,6 +200,7 @@ const TensorSpaceVisualizer = () => {
       // Initialize the TensorSpace model with statistics enabled
       let model = new TSP.models.Sequential(container, { 
         stats: true,
+        animationTimeRatio: 1.0, // Default animation speed
         // Both ways to register click handlers
         layerClick: handleLayerClick,
         onClick: handleLayerClick
@@ -442,17 +458,62 @@ const TensorSpaceVisualizer = () => {
     init();
   }, []);
 
-  // Add this function before the return statement in the component
+  // Enhanced function with more detailed image processing explanations
   const getLayerExplanation = (layerType) => {
     const explanations = {
-      'RGBInput': 'Accepts RGB image data as input with three channels (Red, Green, Blue). This is the starting point of the neural network where raw pixel data enters the model.',
-      'Conv2d': 'Convolutional 2D layer that applies learnable filters to the input to extract features. These filters scan the input data to detect patterns like edges, textures, or shapes.',
-      'DepthwiseConv2d': 'A specialized convolution that processes each input channel separately using a single filter per channel. This reduces computation while still capturing spatial patterns.',
-      'GlobalPooling2d': 'Reduces the spatial dimensions by taking the average of all values in each feature map. This converts a 3D tensor to a 1D feature vector suitable for final classification.',
-      'Output1d': 'The final layer that outputs the classification predictions. Values represent the probability scores for each possible class.'
+      'RGBInput': `Accepts RGB image data (224x224x3) with three color channels (Red, Green, Blue). 
+      
+      How it processes images:
+      • Normalizes pixel values from 0-255 to a smaller range (typically -1 to 1 or 0 to 1)
+      • Arranges pixels in a 3D tensor format that the network can process
+      • May apply preprocessing like mean subtraction or standard scaling
+      
+      This is where your raw image enters the neural network's processing pipeline.`,
+
+      'Conv2d': `Convolutional 2D layer that slides learnable filters across the image to extract visual features.
+      
+      How it processes images:
+      • Each filter (typically 3×3 or 5×5 pixels) scans the entire image
+      • Early Conv2D layers detect simple features like edges, corners, and color blobs
+      • Deeper Conv2D layers combine these to recognize complex patterns like textures, parts of objects
+      • Creates feature maps highlighting where specific patterns appear in the image
+      
+      Example: Lower layers might detect horizontal edges in a cat image, while higher layers identify whiskers or ear shapes.`,
+
+      'DepthwiseConv2d': `A memory-efficient convolution that processes each input channel separately.
+      
+      How it processes images:
+      • Unlike standard convolution, applies a single filter per input channel
+      • Preserves spatial information while using ~9× fewer parameters than Conv2D
+      • Particularly effective at capturing shape features while minimizing computation
+      • Often paired with Pointwise (1×1) convolutions in mobile architectures
+      
+      This is how MobileNet efficiently processes spatial patterns while keeping the model lightweight.`,
+
+      'GlobalPooling2d': `Reduces spatial dimensions by taking the average of all values in each feature map.
+      
+      How it processes images:
+      • Condenses all spatial information (height×width) into a single value per feature map
+      • Transforms a 3D tensor (height×width×channels) into a 1D feature vector
+      • Creates a position-invariant representation of detected features
+      • Dramatically reduces parameters while preserving the most important information
+      
+      This layer answers "what" features are present anywhere in the image, discarding "where" they appear.`,
+
+      'Output1d': `The final classification layer that maps features to prediction scores.
+      
+      How it processes images:
+      • Takes the condensed feature vector from previous layers
+      • Applies learned weights to determine how strongly each feature indicates each class
+      • Generates 1000 probability scores (one per ImageNet class)
+      • Often uses softmax activation to ensure scores sum to 100%
+      
+      If a cat image shows high activation in neurons detecting whiskers, pointed ears, and fur texture, this layer will produce a high probability score for "cat" classes.`
     };
 
-    return explanations[layerType] || 'Processes input data through trainable parameters to extract or transform features in the neural network.';
+    return explanations[layerType] || `Processes visual features through trainable parameters to transform and extract increasingly abstract representations of the image.
+    
+    Each layer builds upon previous layers, gradually converting pixel data into meaningful visual concepts that can be used for classification.`;
   };
 
   const renderSidebarLayers = () => {
@@ -504,7 +565,7 @@ const TensorSpaceVisualizer = () => {
       backgroundColor: "#121212",
       fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif"
     }}>
-      {/* Main canvas - adjust width to accommodate left sidebar when open */}
+      {/* Main canvas */}
       <div id="container" style={{ 
         width:  leftSidebarOpen ? "70%" : "100%",
         height: "100%",
@@ -541,7 +602,7 @@ const TensorSpaceVisualizer = () => {
         {leftSidebarOpen ? "←" : "→"}
       </button>
       
-      {/* EnhancedImagePanel as left sidebar - now with simplified onSelectImage */}
+      {/* EnhancedImagePanel as left sidebar */}
       <EnhancedImagePanel 
         isOpen={leftSidebarOpen} 
         onSelectImage={handleImageSelect} 
@@ -584,7 +645,7 @@ const TensorSpaceVisualizer = () => {
           height: "100%",
           backgroundColor: "rgba(245, 245, 245, 0.95)", 
           borderLeft: "1px solid #ddd",
-          overflow: "hidden", // Changed to hidden to prevent scrolling issues with tabs
+          overflow: "hidden",
           boxShadow: "-5px 0 15px rgba(0,0,0,0.2)",
           zIndex: 5,
           transition: "right 0.3s ease",
@@ -825,7 +886,7 @@ const TensorSpaceVisualizer = () => {
         </div>
       </div>
 
-      {/* Loading overlay - improved */}
+      {/* Loading overlay */}
       {loading && (
         <div
           id="loadingPad"
@@ -880,7 +941,7 @@ const TensorSpaceVisualizer = () => {
         </div>
       )}
 
-      {/* Improved prediction output bar */}
+      {/* Prediction output bar */}
       <div 
         style={{ 
           position: "fixed", 
@@ -897,17 +958,64 @@ const TensorSpaceVisualizer = () => {
           borderRadius: "30px",
           boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
           backdropFilter: "blur(10px)",
-          display: prediction ? "block" : "none"
+          display: prediction ? "block" : "none",
+          transition: "opacity 0.5s ease",
+          opacity: prediction ? 1 : 0
         }}>
         <p style={{ margin: 0, fontSize: "1em", fontWeight: "300" }}>{prediction}</p>
       </div>
 
-      {/* Add global styles for animations */}
+      {/* Network Animation Component with key for remounting */}
+      <NetworkAnimation 
+        key={showAnimationControls ? "visible" : "hidden"} // Force remount when visibility changes
+        modelRef={modelRef}
+        isVisible={showAnimationControls} 
+        onAnimationComplete={handleAnimationComplete}
+        getLayerExplanation={getLayerExplanation}
+      />
+
+      {/* Add global styles for animations with matching class names */}
       <style dangerouslySetInnerHTML={{
         __html: `
           @keyframes loadingBar {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(400%); }
+          }
+          
+          @keyframes pulse {
+            0% { opacity: 0.6; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.6; transform: scale(0.8); }
+          }
+          
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px) translateX(-50%); }
+            to { opacity: 1; transform: translateY(0) translateX(-50%); }
+          }
+          
+          @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.6); }
+            to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.9); }
+          }
+          
+          /* Updated class name from animating-layer to layer-animation */
+          .layer-animation {
+            animation: glow 1.5s infinite alternate;
+          }
+          
+          /* Added for sidebar styling */
+          .layer-details-sidebar {
+            transition: right 0.3s ease;
+          }
+          
+          /* Class for the main container */
+          .visualizer-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #121212;
+            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
           }
           
           button:hover {
@@ -918,11 +1026,19 @@ const TensorSpaceVisualizer = () => {
           button:active {
             transform: translateY(0);
           }
-
-          document.querySelectorAll(".tooltip").forEach((tooltip) => {
-            tooltip.style.color = "white";
-            tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-          });
+          
+          /* Ensure TensorSpace container has appropriate z-index */
+          #container {
+            z-index: 5;
+            position: relative;
+          }
+          
+          /* Class for network animation elements */
+          .network-animation-controls,
+          .network-animation-progress,
+          .layer-info-tooltip {
+            z-index: 1000;
+          }
         `
       }} />
     </div>

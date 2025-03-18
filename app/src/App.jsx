@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import LayerVisualizerPage from './pages/LayerVisualizerPage'
 import './App.css'
+import './styles/TensorVisualizer.css';
 
 function App() {
   return (
