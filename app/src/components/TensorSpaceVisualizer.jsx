@@ -7,7 +7,7 @@ const TensorSpaceVisualizer = () => {
   const [prediction, setPrediction] = useState(null);
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(true); // Add left sidebar state
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false); // Add left sidebar state
   const [activeTab, setActiveTab] = useState('details'); // 'details' or 'list'
   const initCalled = useRef(false);
   const modelRef = useRef(null);
@@ -117,19 +117,19 @@ const TensorSpaceVisualizer = () => {
       let jsonFilePath;
       switch(image.name) {
         case 'Cat':
-            jsonFilePath = "/public/assets/data/cat.json";
+            jsonFilePath = "/assets/data/cat.json";
           break;
         case 'Dog':
-          jsonFilePath = '/public/assets/data/dog.json';
+          jsonFilePath = '/assets/data/dog.json';
           break;
         case 'Bird':
-          jsonFilePath = '/public/assets/data/bird.json';
+          jsonFilePath = '/assets/data/bird.json';
           break;
         case 'Car':
-          jsonFilePath = '/public/assets/data/car.json';
+          jsonFilePath = '/assets/data/car.json';
           break;
         case 'Coffeepot':
-          jsonFilePath = '/public/assets/data/coffeepot.json';
+          jsonFilePath = '/assets/data/coffeepot.json';
           break;
         default:
           // Default fallback for uploaded images or unknown types
@@ -918,6 +918,11 @@ const TensorSpaceVisualizer = () => {
           button:active {
             transform: translateY(0);
           }
+
+          document.querySelectorAll(".tooltip").forEach((tooltip) => {
+            tooltip.style.color = "white";
+            tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+          });
         `
       }} />
     </div>
