@@ -551,14 +551,12 @@ const NetworkAnimation = ({
           top: "140px",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "70%",
           maxWidth: "800px",
           height: "6px",
-            width: `${((currentAnimatingLayer + 1) / modelRef.current.layers.length) * 100}%`,
-            background: "linear-gradient(90deg, #4285f4, #34a853)",
-            borderRadius: "3px",
-            transition: "width 0.3s ease-out"
-          }} />
+          background: "linear-gradient(90deg, #4285f4, #34a853)",
+          borderRadius: "3px",
+          transition: "width 0.3s ease-out"
+        }} />
       )}
       
       {/* Layer information tooltip during animation */}

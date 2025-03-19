@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
  * EnhancedImagePanel component for selecting and preprocessing images
  * for neural network visualization with TensorSpace
  */
-const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
+const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage }) => {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,8 +19,7 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
           { id: 1, name: 'Cat', path: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba', thumbnail: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300' },
           { id: 2, name: 'Dog', path: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1', thumbnail: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=300' },
           { id: 3, name: 'Bird', path: 'https://images.unsplash.com/photo-1444464666168-49d633b86797', thumbnail: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=300' },
-          { id: 4, name: 'Car', path: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf', thumbnail: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300' },
-          { id: 5, name: 'Coffeepot', path:'https://plus.unsplash.com/premium_photo-1674327105280-b86494dfc690', thumbnail:'https://plus.unsplash.com/premium_photo-1674327105280-b86494dfc690?auto=format&fit=crop&w=300' }
+          { id: 4, name: 'Car', path: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf', thumbnail: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300' }
         ];
         
         setImages(sampleImages);
@@ -37,8 +36,10 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
   // Handle image click - simplified to just pass the image to parent
   const handleImageClick = (image) => {
     setSelectedImage(image);
-    // Simply pass the selected image to parent, no fetching here
-    onSelectImage(image);
+    onSelectImage({
+      ...image,
+      gradcamPath: `/assets/data/${image.name}_GC.jpg`
+    });
   };
   
   // Handle file upload - simplified
@@ -65,7 +66,7 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
   };
   
   return (
-    <div style={{
+    <div className="image-panel" style={{
       position: 'absolute',
       top: 0,
       left: isOpen ? 0 : '-350px',
@@ -74,7 +75,7 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
       backgroundColor: 'rgba(245, 245, 245, 0.95)',
       borderRight: '1px solid #ddd',
       boxShadow: '5px 0 15px rgba(0,0,0,0.2)',
-      zIndex: 5,
+      zIndex: 10,
       transition: 'left 0.3s ease',
       backdropFilter: 'blur(10px)',
       display: 'flex',
@@ -271,6 +272,64 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage }) => {
           >
             {isLoading ? 'Processing...' : 'Visualize with this image'}
           </button>
+        </div>
+      )}
+
+      {/* GradCAM visualization */}
+      {gradcamImage && selectedImage && (
+        <div style={{
+          padding: "20px",
+          backgroundColor: "rgba(76, 175, 80, 0.05)",
+          borderTop: "1px solid rgba(0,0,0,0.1)",
+          marginTop: "auto"
+        }}>
+          <h4 style={{
+            margin: "0 0 15px 0",
+            color: "#4CAF50",
+            fontSize: "16px",
+            fontWeight: "500",
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: "1px"
+          }}>
+            GradCAM Visualization
+          </h4>
+          <div style={{
+            backgroundColor: "white",
+            padding: "10px",
+            borderRadius: "12px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          }}>
+            <img
+              src={gradcamImage}
+              alt={`GradCAM visualization for ${selectedImage.name}`}
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: "8px",
+                display: "block",
+                margin: "0 auto"
+              }}
+              onError={(e) => {
+                console.error("Error loading GradCAM image");
+                e.target.style.display = "none";
+                e.target.parentElement.innerHTML = `
+                  <div style="text-align: center; padding: 20px; color: #666;">
+                    GradCAM visualization not available
+                  </div>
+                `;
+              }}
+            />
+          </div>
+          <p style={{
+            margin: "10px 0 0",
+            fontSize: "13px",
+            color: "#666",
+            textAlign: "center",
+            fontStyle: "italic"
+          }}>
+            Highlighting regions of interest for {selectedImage.name}
+          </p>
         </div>
       )}
     </div>

@@ -13,6 +13,7 @@ const TensorSpaceVisualizer = () => {
   // Replace animation states with just what we need for the component interaction
   const [showAnimationControls, setShowAnimationControls] = useState(false);
   const [animationSpeed, setAnimationSpeed] = useState(1);
+  const [gradcamImage, setGradcamImage] = useState(null);
   const initCalled = useRef(false);
   const modelRef = useRef(null);
   const outputLabels = window.result 
@@ -105,6 +106,16 @@ const TensorSpaceVisualizer = () => {
     console.log("Sidebar state:", !sidebarOpen);
   };
 
+  // Add this helper function near your other utility functions
+  const checkImageExists = async (url) => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  };
+
   // Simplified handleImageSelect with animation controls
   const handleImageSelect = async (image) => {
     console.log("Selected image:", image.name);
@@ -116,10 +127,22 @@ const TensorSpaceVisualizer = () => {
     
     try {
       setLoading(true);
-      setPrediction(null); // Clear previous prediction
-      setShowAnimationControls(false); // Hide animation controls while loading
+      setPrediction(null);
+      setGradcamImage(null);
+      setShowAnimationControls(false);
       
-      // Hardcoded mapping of image names to JSON files
+      // Construct GradCAM image path
+      const gradcamPath = `/assets/data/${image.name}_GC.jpg`;
+      const gradcamExists = await checkImageExists(gradcamPath);
+      if (gradcamExists) {
+        console.log("GradCAM image found:", gradcamPath);
+        setGradcamImage(gradcamPath);
+      } else {
+        console.warn('GradCAM image not found:', gradcamPath);
+        setGradcamImage(null);
+      }
+
+      // Rest of your existing handleImageSelect code
       let jsonFilePath;
       switch(image.name) {
         case 'Cat':
@@ -149,13 +172,10 @@ const TensorSpaceVisualizer = () => {
       
       setLoading(false);
       
-      // Predict with the fetched image data (storing result for the animation to use)
       modelRef.current.predict(imageData, function(result) {
         window.currentPredictionResult = result;
-        
-        // Show animation controls after prediction is ready
         setTimeout(() => {
-          setShowAnimationControls(true); // Show animation controls after a slight delay
+          setShowAnimationControls(true);
         }, 300);
       });
     } catch (error) {
@@ -163,6 +183,7 @@ const TensorSpaceVisualizer = () => {
       setPrediction("Error processing image: " + error.message);
       setLoading(false);
       setShowAnimationControls(false);
+      setGradcamImage(null);
     }
   };
 
@@ -612,6 +633,7 @@ const TensorSpaceVisualizer = () => {
       <EnhancedImagePanel 
         isOpen={leftSidebarOpen} 
         onSelectImage={handleImageSelect} 
+        gradcamImage={gradcamImage} // Add this prop
       />
       
       {/* Toggle right sidebar button */}
@@ -946,6 +968,8 @@ const TensorSpaceVisualizer = () => {
           </p>
         </div>
       )}
+
+
 
       {/* Prediction output bar */}
       <div 
