@@ -5,7 +5,7 @@
   overflow: hidden;
   background-color: #121212;
   font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-  padding-top: 0; /* Remove padding since nav is hidden by default */
+  padding-top: 0;
 }
 
 .visualizer-canvas {
@@ -14,7 +14,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  transition: width 0.3s ease, left 0.3s ease, right 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .visualizer-canvas.left-open {
@@ -29,7 +29,7 @@
 .toggle-button {
   position: absolute;
   top: 80px;
-  background-color: rgba(76, 175, 80, 0.9); /* Default for left */
+  background-color: rgba(76, 175, 80, 0.9);
   color: white;
   border: none;
   border-radius: 50%;
@@ -39,10 +39,20 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
   z-index: 10;
-  transition: left 0.3s ease, right 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   font-size: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.toggle-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-button:active {
+  transform: scale(0.95);
 }
 
 .toggle-button.left {
@@ -59,5 +69,147 @@
 }
 
 .toggle-button.right.shifted {
-  right: 350px;
+  right: 370px;
+}
+
+/* UI improvement for prediction bar */
+.prediction-bar {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  width: auto;
+  background: rgba(26, 26, 46, 0.8);
+  color: white;
+  padding: 12px 30px;
+  text-align: center;
+  z-index: 10;
+  border-radius: 40px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(142, 154, 255, 0.3);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prediction-bar.minimized {
+  max-width: 60px;
+  padding: 12px;
+  border-radius: 50%;
+  background: rgba(142, 154, 255, 0.8);
+}
+
+.prediction-bar.minimized .prediction-icon,
+.prediction-bar.minimized p {
+  display: none;
+}
+
+.minimize-button {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #8e9aff;
+  color: #121212;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.minimize-button:hover {
+  transform: scale(1.1);
+}
+
+.prediction-bar p {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 300;
+  color: #e0e0e0;
+}
+
+.prediction-icon {
+  margin-right: 10px;
+  color: #8e9aff;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.6; transform: scale(0.8); }
+}
+
+.layer-info-tooltip {
+  position: fixed;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  background: rgba(26, 26, 46, 0.9);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  z-index: 100;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(142, 154, 255, 0.3);
+  max-width: 400px;
+  text-align: center;
+  animation: fadeInDown 0.5s forwards;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.layer-info-tooltip strong {
+  color: #8e9aff;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .visualizer-canvas.left-open {
+    width: 100%;
+    left: 0;
+    opacity: 0.3;
+  }
+  
+  .visualizer-canvas.right-open {
+    width: 100%;
+    right: 0;
+    opacity: 0.3;
+  }
+  
+  .toggle-button.left.shifted {
+    left: 20px;
+  }
+  
+  .toggle-button.right.shifted {
+    right: 20px;
+  }
+  
+  .prediction-bar {
+    max-width: 95%;
+    padding: 10px 20px;
+    bottom: 80px;
+  }
+  
+  .prediction-bar.minimized {
+    max-width: 50px;
+    padding: 10px;
+  }
 }
