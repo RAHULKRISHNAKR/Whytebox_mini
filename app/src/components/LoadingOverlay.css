@@ -1,0 +1,57 @@
+.loading-overlay {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(3, 29, 50, 0.95);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .loading-container {
+    position: relative;
+  }
+  
+  .loading-gif {
+    width: 200px;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+  }
+  
+  .loading-bar {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  
+  .loading-progress {
+    height: 100%;
+    width: 30%;
+    background-color: #4285f4;
+    border-radius: 2px;
+    animation: loadingBar 1.5s infinite ease-in-out;
+  }
+  
+  p {
+    color: white;
+    margin-top: 40px;
+    letter-spacing: 1px;
+    font-size: 16px;
+  }
+  
+  @keyframes loadingBar {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(400%);
+    }
+  }

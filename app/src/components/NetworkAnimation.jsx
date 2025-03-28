@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './NetworkAnimation.css';
 
 const NetworkAnimation = ({ 
   modelRef, 
@@ -420,262 +421,54 @@ const NetworkAnimation = ({
 
   return (
     <>
-      {/* Animation controls - floating panel */}
-      <div className="network-animation-controls" style={{
-        position: "absolute",
-        top: "80px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        backgroundColor: "rgba(0,0,0,0.8)",
-        borderRadius: "50px",
-        padding: "12px 25px",
-        display: "flex",
-        alignItems: "center",
-        gap: "15px",
-        boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
-        zIndex: 1000, // Ensure high z-index to appear above other elements
-        backdropFilter: "blur(5px)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        animation: "fadeIn 0.5s ease-out"
-      }}>
-        {/* Play/Pause button */}
+      <div className="network-animation-controls">
         <button
           onClick={() => {
-            if (isAnimating) {
-              stopAnimation();
-            } else {
-              animateNetworkProcessing();
-            }
+            if (isAnimating) stopAnimation();
+            else animateNetworkProcessing();
           }}
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            color: "white",
-            fontSize: "24px",
-            cursor: "pointer",
-            outline: "none",
-            width: "40px",
-            height: "40px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "50%",
-            transition: "background-color 0.3s, transform 0.2s"
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+          className="network-animation__button"
         >
           {isAnimating ? "⏸" : "▶️"}
         </button>
         
-        {/* Speed control */}
-        <div style={{ color: "white", fontSize: "14px", fontWeight: "500" }}>Speed:</div>
-        <input 
+        <div>Speed:</div>
+        <input
           type="range"
-          min="0.1"    // Changed from 0.5 to 0.1 for slower speeds
-          max="2.0"    // Reduced from 3.0 to 2.0
-          step="0.1"   // Smaller steps for finer control
+          min="0.1"
+          max="2.0"
+          step="0.1"
           value={animationSpeed}
           onChange={(e) => setAnimationSpeed(parseFloat(e.target.value))}
-          style={{
-            width: "100px",
-            accentColor: "#4285f4",
-            cursor: "pointer"
-          }}
         />
-        <div style={{ color: "white", fontSize: "14px", width: "30px" }}>
-          {animationSpeed}x
-        </div>
+        <div>{animationSpeed}x</div>
         
-        {/* Progress indicator */}
-        <div style={{ 
-          color: "white", 
-          fontSize: "14px",
-          marginLeft: "10px",
-          display: "flex",
-          alignItems: "center"
-        }}>
+        <div>
           {isAnimating ? (
             <>
-              <span 
-                style={{ 
-                  display: "inline-block",
-                  width: "8px",
-                  height: "8px",
-                  backgroundColor: "#4CAF50",
-                  borderRadius: "50%",
-                  marginRight: "8px",
-                  animation: "pulse 1s infinite" 
-                }} 
-              />
-              <span>
-                Layer {currentAnimatingLayer + 1}/{modelRef.current?.layers?.length || '?'}
-              </span>
+              <span className="pulse-indicator"></span>
+              <span>Layer {currentAnimatingLayer + 1}/{modelRef.current?.layers?.length || '?'}</span>
             </>
           ) : animationComplete ? (
-            <>
-              <span 
-                style={{ 
-                  display: "inline-block",
-                  width: "8px",
-                  height: "8px",
-                  backgroundColor: "#8ab4f8",
-                  borderRadius: "50%",
-                  marginRight: "8px"
-                }} 
-              />
-              <span>Complete!</span>
-            </>
+            <>Complete!</>
           ) : (
-            <>
-              <span 
-                style={{ 
-                  display: "inline-block",
-                  width: "8px",
-                  height: "8px",
-                  backgroundColor: "#FFC107",
-                  borderRadius: "50%",
-                  marginRight: "8px"
-                }} 
-              />
-              <span>Ready</span>
-            </>
+            <>Ready</>
           )}
         </div>
       </div>
       
-      {/* Animation progress bar */}
       {isAnimating && modelRef.current && modelRef.current.layers && (
-        <div className="network-animation-progress" style={{
-          position: "absolute",
-          top: "140px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          maxWidth: "800px",
-          height: "6px",
-          background: "linear-gradient(90deg, #4285f4, #34a853)",
-          borderRadius: "3px",
-          transition: "width 0.3s ease-out"
-        }} />
+        <div className="network-animation-progress" />
       )}
       
-      {/* Layer information tooltip during animation */}
       {isAnimating && currentAnimatingLayer >= 0 && modelRef.current?.layers[currentAnimatingLayer] && (
-        <div className="layer-info-tooltip" style={{
-          position: "absolute",
-          top: "155px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          backgroundColor: "rgba(0,0,0,0.8)",
-          color: "white",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          fontSize: "14px",
-          zIndex: 1000,
-          maxWidth: "80%",
-          textAlign: "center",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          marginTop: "10px",
-          backdropFilter: "blur(5px)",
-          animation: "fadeIn 0.3s ease-out"
-        }}>
-          <strong style={{ fontSize: "16px", color: "#8ab4f8" }}>
-            {modelRef.current.layers[currentAnimatingLayer].config?.layerName || `Layer ${currentAnimatingLayer}`}
-          </strong>
-          <p style={{ 
-            margin: "8px 0 0", 
-            opacity: 0.9, 
-            fontSize: "14px",
-            lineHeight: "1.4"
-          }}>
-            {getLayerExplanation(modelRef.current.layers[currentAnimatingLayer].layerType).split('\n')[0]}
-          </p>
+        <div className="layer-info-tooltip">
+          <strong>{modelRef.current.layers[currentAnimatingLayer].config?.layerName || `Layer ${currentAnimatingLayer}`}</strong>
+          <p>{getLayerExplanation(modelRef.current.layers[currentAnimatingLayer].layerType).split('\n')[0]}</p>
         </div>
       )}
-      
-      {/* Replace styled-jsx with regular style tag */}
-      <style>
-        {`
-          @keyframes pulse {
-            0% { opacity: 0.6; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
-            100% { opacity: 0.6; transform: scale(0.8); }
-          }
-          
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px) translateX(-50%); }
-            to { opacity: 1; transform: translateY(0) translateX(-50%); }
-          }
-          
-          .layer-animation {
-            animation: glow 1.5s infinite alternate;
-          }
-          
-          @keyframes glow {
-            from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.6); }
-            to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.9); }
-          }
-          
-          .network-animation-controls {
-            transition: opacity 0.3s ease;
-          }
-          
-          .network-animation-progress {
-            transition: width 0.3s ease-out;
-          }
-          
-          .layer-info-tooltip {
-            animation: fadeIn 0.3s ease-out;
-          }
-        `}
-      </style>
     </>
   );
-};
-
-// Debug commands to run in browser console
-window.debugNetwork = {
-  getModelInfo: () => {
-    const model = document.querySelector('#root')?.__reactFiber$?.child?.child?.child?.memoizedProps?.modelRef?.current;
-    console.log('Model:', model);
-    console.log('Layers:', model?.layers);
-  },
-  checkLayers: () => {
-    const elements = document.querySelectorAll('div[id*="layer_"]');
-    console.log('Layer elements:', elements);
-  },
-  inspectLayer: (index) => {
-    const layer = modelRef.current?.layers[index];
-    console.log('Layer:', layer);
-    console.log('Methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(layer)));
-    console.log('Element:', findLayerElement(index));
-  },
-  checkLayerProperties: (index) => {
-    const layer = modelRef.current?.layers[index];
-    if (!layer) return console.log('Layer not found');
-    
-    console.log('Layer Properties:', {
-      hasNeuralGroup: !!layer.neuralGroup,
-      childCount: layer.neuralGroup?.children?.length,
-      hasMaterial: layer.neuralGroup?.children[0]?.material,
-      isEmissive: layer.isEmissive,
-      minOpacity: layer.minOpacity,
-      color: layer.color,
-      type: layer.layerType,
-      name: layer.config?.layerName
-    });
-    
-    // Log first child's material properties
-    const firstChild = layer.neuralGroup?.children[0];
-    if (firstChild?.material) {
-      console.log('Material properties:', 
-        Array.isArray(firstChild.material) 
-          ? firstChild.material[0] 
-          : firstChild.material
-      );
-    }
-  }
 };
 
 export default NetworkAnimation;

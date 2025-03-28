@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import TensorSpaceVisualizer from '../components/TensorSpaceVisualizer'
-import '../styles/LayerVisualizerPage.css'
+import TensorSpaceVisualizer from '../components/TensorSpaceVisualizer.jsx'
+import './LayerVisualizerPage.css'
 
 function LayerVisualizerPage() {
   const navigate = useNavigate()

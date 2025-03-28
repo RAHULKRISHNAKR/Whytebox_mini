@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import '../styles/HomePage.css'
+import './HomePage.css'
 import BeginnersGuide from '../components/BeginnersGuide'
 
 function HomePage() {

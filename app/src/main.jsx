@@ -7,7 +7,6 @@ import Stats from "stats-js";
 import TWEEN from "@tweenjs/tween.js";
 import TrackballControls from "three-trackballcontrols";
 import * as tf from "@tensorflow/tfjs";
-import './styles/TensorVisualizer.css';
 
 window.THREE = THREE;
 window.TrackballControls = TrackballControls;
