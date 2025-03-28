@@ -5,7 +5,7 @@ import './EnhancedImagePanel.css';
  * EnhancedImagePanel component for selecting and preprocessing images
  * for neural network visualization with TensorSpace
  */
-const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage }) => {
+const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "0" }) => {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,8 +96,30 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage }) => {
   };
   
   return (
-    <div className={`image-panel ${isOpen ? 'image-panel--open' : ''}`}>
-      <h3 className="image-panel__header">Image Selection</h3>
+    <div className="image-panel" style={{
+      position: 'absolute',
+      top: "0", // Start from the top since nav is hidden by default
+      left: isOpen ? 0 : '-350px',
+      width: '350px',
+      height: '100%', // Use full height
+      backgroundColor: 'rgba(245, 245, 245, 0.95)',
+      borderRight: '1px solid #ddd',
+      boxShadow: '5px 0 15px rgba(0,0,0,0.2)',
+      zIndex: 10,
+      transition: 'left 0.3s ease',
+      backdropFilter: 'blur(10px)',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <h3 style={{ 
+        padding: '20px', 
+        margin: 0,
+        borderBottom: '1px solid #ddd',
+        textAlign: 'center',
+        color: '#4CAF50'
+      }}>
+        Image Selection
+      </h3>
       
       <div className="image-panel__tabs">
         <div
