@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import * as TSP from "tensorspace";
 import EnhancedImagePanel from "./EnhancedImagePanel"; 
 import NetworkAnimation from "./NetworkAnimation";
+import Navigation from "./Navigation";
 
 const TensorSpaceVisualizer = () => {
   const [loading, setLoading] = useState(true);
@@ -590,14 +591,18 @@ const TensorSpaceVisualizer = () => {
       height: "100vh", 
       overflow: "hidden",
       backgroundColor: "#121212",
-      fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif"
+      fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif",
+      paddingTop: "0" // Remove padding since nav is hidden by default
     }}>
-      {/* Main canvas */}
+      {/* Add Navigation bar */}
+      <Navigation />
+      
+      {/* Main canvas - adjust top position */}
       <div id="container" style={{ 
-        width:  leftSidebarOpen ? "70%" : "100%",
-        height: "100%",
+        width: leftSidebarOpen ? "70%" : "100%",
+        height: "100%", // Use full height since nav is hidden
         position: "absolute",
-        top: 0,
+        top: "0", // Start from the top
         left: leftSidebarOpen ? "350px" : 0,
         transition: "width 0.3s ease, left 0.3s ease",
         right: sidebarOpen ? "350px" : 0,
@@ -608,7 +613,7 @@ const TensorSpaceVisualizer = () => {
         onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
         style={{
           position: "absolute",
-          top: "20px",
+          top: "80px", // Adjust position to be below navigation
           left: leftSidebarOpen ? "370px" : "20px",
           backgroundColor: "rgba(76, 175, 80, 0.9)",
           color: "white",
@@ -629,19 +634,20 @@ const TensorSpaceVisualizer = () => {
         {leftSidebarOpen ? "←" : "→"}
       </button>
       
-      {/* EnhancedImagePanel as left sidebar */}
+      {/* EnhancedImagePanel as left sidebar - adjust top position */}
       <EnhancedImagePanel 
         isOpen={leftSidebarOpen} 
         onSelectImage={handleImageSelect} 
-        gradcamImage={gradcamImage} // Add this prop
+        gradcamImage={gradcamImage}
+        topOffset="60px" // Pass prop to adjust for navigation
       />
       
-      {/* Toggle right sidebar button */}
+      {/* Toggle right sidebar button - adjust top position */}
       <button 
         onClick={toggleSidebar}
         style={{
           position: "absolute",
-          top: "20px",
+          top: "80px", // Adjust position to be below navigation
           right: sidebarOpen ? "350px" : "20px",
           backgroundColor: "rgba(66, 133, 244, 0.9)",
           color: "white",
@@ -662,15 +668,15 @@ const TensorSpaceVisualizer = () => {
         {sidebarOpen ? "→" : "←"}
       </button>
       
-      {/* Consolidated sidebar with tabs */}
+      {/* Consolidated sidebar with tabs - adjust top position */}
       <div 
         className="layer-details-sidebar"
         style={{ 
           position: "absolute",
-          top: 0,
+          top: "60px", // Adjust position to be below navigation
           right: sidebarOpen ? "0" : "-350px",
           width: "350px", 
-          height: "100%",
+          height: "calc(100% - 60px)", // Adjust height for navigation 
           backgroundColor: "rgba(245, 245, 245, 0.95)", 
           borderLeft: "1px solid #ddd",
           overflow: "hidden",

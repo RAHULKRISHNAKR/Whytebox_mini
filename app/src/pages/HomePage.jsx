@@ -1,11 +1,12 @@
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import '../styles/HomePage.css'
-import BeginnersGuide from '../components/BeginnersGuide'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import BeginnersGuide from '../components/BeginnersGuide';
+import Navigation from '../components/Navigation';
+import '../styles/HomePage.css';
 
 function HomePage() {
-  const navigate = useNavigate()
-  const [showGuide, setShowGuide] = useState(false)
+  const navigate = useNavigate();
+  const [showGuide, setShowGuide] = useState(false);
   
   // Only using MobileNetV1 for now
   const currentModelInfo = {
@@ -22,6 +23,9 @@ function HomePage() {
 
   return (
     <div className="home-page">
+      {/* Add Navigation bar */}
+      <Navigation />
+      
       {showGuide && <BeginnersGuide onClose={() => setShowGuide(false)} />}
       
       <div className="hero-section">
@@ -115,7 +119,7 @@ function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
