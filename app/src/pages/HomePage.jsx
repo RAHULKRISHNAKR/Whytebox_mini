@@ -19,6 +19,12 @@ function HomePage() {
     setAnimate(true);
   }, []);
   
+  // Function to handle navigation with debugging
+  const handleNavigation = (path) => {
+    console.log(`Navigating to: ${path}`);
+    navigate(path);
+  };
+  
   // Only using MobileNetV1 for now
   const currentModelInfo = {
     name: "MobileNetV1",
@@ -48,7 +54,8 @@ function HomePage() {
         <div className="hero-buttons">
           <button 
             className="view-model-btn" 
-            onClick={() => navigate('/layer-visualizer')}
+            onClick={() => handleNavigation('/layer-visualizer')}
+            style={{ position: 'relative', zIndex: 2 }}
           >
             View Model
             <span className="btn-icon">→</span>
@@ -106,7 +113,8 @@ function HomePage() {
           <p>Dive into the architecture of neural networks through our interactive 3D environment. Explore layers, filters, and activations like never before.</p>
           <button 
             className="preview-btn" 
-            onClick={() => navigate('/layer-visualizer')}
+            onClick={() => handleNavigation('/layer-visualizer')}
+            style={{ position: 'relative', zIndex: 2 }}
           >
             Explore Now
             <span className="btn-icon">→</span>
@@ -219,7 +227,7 @@ function HomePage() {
       <footer className="home-footer">
         <p>© 2025 WhyteBox | KTU S6 Data Science Mini Project</p>
         <div className="footer-links">
-          <a href="https://github.com/rahulkrishnakr/whytebox2.o" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://github.com/CoderZ865/Whytebox2.0" target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href="#" onClick={(e) => {e.preventDefault(); setShowGuide(true);}}>Beginners Guide</a>
           <a href="rahulkridhna@gmail.com">Contact</a>
         </div>

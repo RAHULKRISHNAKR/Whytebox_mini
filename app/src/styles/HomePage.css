@@ -48,6 +48,7 @@ body {
     radial-gradient(circle at 20% 30%, rgba(142, 154, 255, 0.15), transparent 70%),
     radial-gradient(circle at 80% 70%, rgba(142, 154, 255, 0.1), transparent 60%);
   z-index: 0;
+  pointer-events: none;
 }
 
 .hero-section h1 {
@@ -248,6 +249,9 @@ body {
   display: inline-flex;
   align-items: center;
   transition: all 0.3s ease;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 5;
 }
 
 .preview-btn:hover {
@@ -488,7 +492,6 @@ body {
 }
 
 /* Existing styles remain unchanged */
-// ...existing code...
 
 /* Model Selection */
 .model-selection {
@@ -522,6 +525,8 @@ body {
   display: flex;
   justify-content: center;
   gap: 1.2rem;
+  position: relative;
+  z-index: 5;
 }
 
 .view-model-btn, .guide-btn {
@@ -534,6 +539,7 @@ body {
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
+  pointer-events: auto !important;
 }
 
 .view-model-btn {
