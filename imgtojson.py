@@ -5,10 +5,7 @@ import os
 
 # List of image file paths
 image_paths = [
-    r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\bird.png",
-r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\car.png",
-r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\cat.png",
-r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\dog.png"
+r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\car.png"
 ]
 
 # ImageNet means for normalization
