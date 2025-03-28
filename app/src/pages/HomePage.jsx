@@ -1,13 +1,23 @@
-
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import './HomePage.css'
+import { useState, useEffect } from 'react' // Add useEffect import
+import '../styles/HomePage.css' // Fix the CSS import path
 import BeginnersGuide from '../components/BeginnersGuide'
 import Navigation from '../components/Navigation';
+// Add a placeholder image if you don't have one yet
+// import visualizationImage from '../assets/network-visualization.png';
+// Use this as fallback if the image doesn't exist
+const placeholderImage = "https://placehold.co/600x400/1a1a2e/8e9aff?text=Neural+Network+Visualization";
 
 function HomePage() {
   const navigate = useNavigate();
   const [showGuide, setShowGuide] = useState(false);
+  // Add state for animations
+  const [animate, setAnimate] = useState(false);
+  
+  // Add useEffect to trigger animations after component mounts
+  useEffect(() => {
+    setAnimate(true);
+  }, []);
   
   // Only using MobileNetV1 for now
   const currentModelInfo = {
@@ -29,7 +39,9 @@ function HomePage() {
       
       {showGuide && <BeginnersGuide onClose={() => setShowGuide(false)} />}
       
-      <div className="hero-section">
+      {/* Add animate-in class for animations */}
+      <div className={`hero-section ${animate ? 'animate-in' : ''}`}>
+        <div className="hero-background-element"></div>
         <h1>WhyteBox: Neural Network Visualizer</h1>
         <p className="tagline">Explore and understand Convolutional Neural Networks through interactive 3D visualization</p>
         
@@ -52,12 +64,74 @@ function HomePage() {
         </div>
       </div>
       
+      {/* Add the section divider */}
+      <div className="section-divider">
+        <span className="divider-icon">◆</span>
+      </div>
+      
+      {/* Add Why WhyteBox section */}
+      <div className={`why-whytebox ${animate ? 'animate-in' : ''}`}>
+        <h2>Why WhyteBox?</h2>
+        <div className="why-content">
+          <div className="why-text">
+            <p>Neural networks are often described as "black boxes" due to their complex, opaque nature. WhyteBox aims to transform them into "white boxes" by:</p>
+            <ul className="benefits-list">
+              <li><span className="benefit-icon">🔎</span>Making neural network internals transparent and understandable</li>
+              <li><span className="benefit-icon">🎓</span>Providing educational insights for students and researchers</li>
+              <li><span className="benefit-icon">💡</span>Demystifying how convolutional networks process and interpret images</li>
+              <li><span className="benefit-icon">🛠️</span>Offering a tool for debugging and improving neural network models</li>
+            </ul>
+          </div>
+          <div className="stats-panel">
+            <div className="stat-item">
+              <span className="stat-number">48x</span>
+              <span className="stat-description">Faster understanding of CNN architectures with visual learning</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">100%</span>
+              <span className="stat-description">Open-source visualization tooling</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">28</span>
+              <span className="stat-description">Layers visualized in the current model</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Add visualization preview section */}
+      <div className="visualization-preview">
+        <div className="preview-content">
+          <h2>Interactive 3D Visualization</h2>
+          <p>Dive into the architecture of neural networks through our interactive 3D environment. Explore layers, filters, and activations like never before.</p>
+          <button 
+            className="preview-btn" 
+            onClick={() => navigate('/layer-visualizer')}
+          >
+            Explore Now
+            <span className="btn-icon">→</span>
+          </button>
+        </div>
+        <div className="preview-image">
+          {/* Use placeholder image if you don't have the import yet */}
+          <img src={placeholderImage} alt="Neural Network Visualization Preview" />
+          <div className="image-glow"></div>
+        </div>
+      </div>
+      
+      {/* Update model info panel with header and badge */}
       <div className="model-info-panel">
-        <h2>About {currentModelInfo.name}</h2>
+        <div className="model-header">
+          <h2>About {currentModelInfo.name}</h2>
+          <span className="model-badge">Current Model</span>
+        </div>
         <p>{currentModelInfo.description}</p>
         <ul className="model-features">
           {currentModelInfo.features.map((feature, index) => (
-            <li key={index}><strong>{feature.label}:</strong> {feature.value}</li>
+            <li key={index}>
+              <strong>{feature.label}:</strong> 
+              <span className="feature-value">{feature.value}</span>
+            </li>
           ))}
         </ul>
       </div>
@@ -114,11 +188,42 @@ function HomePage() {
           </ol>
         </div>
         
-        <div className="detail-section">
+        {/* Update the team section with team members */}
+        <div className="detail-section team-section">
           <h2>About the Team</h2>
-          <p>This project was developed as part of the KTU S6 Data Science Mini Project.</p>
+          <p>This project was developed as part of the KTU S6 Data Science Mini Project by a passionate team of students dedicated to making AI more accessible.</p>
+          <div className="team-members">
+            <div className="team-member">
+              <div className="member-avatar">R</div>
+              <div className="member-info">
+                <h3>Rahul Krishna K R</h3>
+              </div>
+            </div>
+            <div className="team-member">
+              <div className="member-avatar">A</div>
+              <div className="member-info">
+                <h3>Azeem N</h3>
+              </div>
+            </div>
+            <div className="team-member">
+              <div className="member-avatar">K</div>
+              <div className="member-info">
+                <h3>Keerthana Kamal</h3>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      
+      {/* Add footer section */}
+      <footer className="home-footer">
+        <p>© 2025 WhyteBox | KTU S6 Data Science Mini Project</p>
+        <div className="footer-links">
+          <a href="https://github.com/rahulkrishnakr/whytebox2.o" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="#" onClick={(e) => {e.preventDefault(); setShowGuide(true);}}>Beginners Guide</a>
+          <a href="rahulkridhna@gmail.com">Contact</a>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -16,7 +16,7 @@ const TensorSpaceVisualizer = () => {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [showAnimationControls, setShowAnimationControls] = useState(false);
-  const [animationSpeed, setAnimationSpeed] = useState(1);
+  const [animationSpeed] = useState(1);
   const [gradcamImage, setGradcamImage] = useState(null);
   const initCalled = useRef(false);
   const modelRef = useRef(null);
@@ -66,7 +66,7 @@ const TensorSpaceVisualizer = () => {
     try {
       const response = await fetch(url, { method: "HEAD" });
       return response.ok;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
