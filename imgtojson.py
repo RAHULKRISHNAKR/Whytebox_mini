@@ -18,6 +18,8 @@ os.makedirs(output_dir, exist_ok=True)
 for image_path in image_paths:
     # Load image
     img = cv2.imread(image_path)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
 
     if img is None:
         print(f"Warning: Could not load image {image_path}")
