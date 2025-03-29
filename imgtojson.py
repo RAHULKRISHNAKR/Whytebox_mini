@@ -5,14 +5,14 @@ import os
 
 # List of image file paths
 image_paths = [
-r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\car.png"
+r"C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/cat2.jpg"
 ]
 
 # ImageNet means for normalization
 imagenet_means = np.array([123.68, 116.779, 103.939], dtype=np.float32)
 
 # Directory to save JSON files
-output_dir = r"D:\Projects\Personal\GitHub\Whytebox2.0\zsample\json_outputs"
+output_dir = r"C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/app/public/assets/data"
 os.makedirs(output_dir, exist_ok=True)
 
 for image_path in image_paths:

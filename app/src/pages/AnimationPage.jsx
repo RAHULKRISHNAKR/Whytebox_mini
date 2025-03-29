@@ -1,6 +1,5 @@
 import React from 'react';
 import Navigation from '../components/Navigation';
-import NetworkAnimation from '../components/NetworkAnimation';
 import { useNavigate } from 'react-router-dom';
 
 function AnimationPage() {
