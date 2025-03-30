@@ -127,6 +127,51 @@ function HomePage() {
         </div>
       </div>
       
+      {/* Add Explainable AI feature card after the visualization preview section */}
+      <div className="explainable-ai-preview">
+        <div className="preview-content">
+          <h2>Understand Your Model's Decisions</h2>
+          <p>
+            Our Explainable AI tools help you look inside the "black box" of neural networks. 
+            See what features influence predictions and why the model makes certain decisions.
+          </p>
+          
+          <div className="xai-techniques">
+            <div className="technique-card">
+              <div className="technique-icon">🔍</div>
+              <h3>Grad-CAM</h3>
+              <p>Highlights regions of input that activate specific classes</p>
+            </div>
+            
+            <div className="technique-card">
+              <div className="technique-icon">📊</div>
+              <h3>LIME</h3>
+              <p>Explains predictions by approximating the model locally</p>
+            </div>
+            
+            <div className="technique-card">
+              <div className="technique-icon">🧮</div>
+              <h3>SHAP</h3>
+              <p>Calculates feature importance using game theory principles</p>
+            </div>
+          </div>
+          
+          <button 
+            className="preview-btn" 
+            onClick={() => handleNavigation('/explainable-ai')}
+          >
+            Explore Explainable AI
+            <span className="btn-icon">→</span>
+          </button>
+        </div>
+        <div className="preview-image">
+          <img src="/assets/images/explainable-ai-preview.jpg" alt="Explainable AI visualization" />
+          <div className="preview-caption">
+            Visualization showing which parts of an image influence the model's prediction
+          </div>
+        </div>
+      </div>
+      
       {/* Update model info panel with header and badge */}
       <div className="model-info-panel">
         <div className="model-header">

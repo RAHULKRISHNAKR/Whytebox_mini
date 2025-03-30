@@ -75,7 +75,8 @@ const Navigation = () => {
           {[
             { path: "/", label: "Home" },
             { path: "/layer-visualizer", label: "Visualization" },
-            { path: "/animation", label: "Animation" }
+            { path: "/animation", label: "Animation" },
+            { path: "/explainable-ai", label: "Explainable AI" }
           ].map(link => (
             <Link 
               key={link.path}

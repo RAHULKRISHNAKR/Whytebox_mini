@@ -8,6 +8,13 @@ import TWEEN from "@tweenjs/tween.js";
 import TrackballControls from "three-trackballcontrols";
 import * as tf from "@tensorflow/tfjs";
 
+// Initialize TensorFlow.js to ensure it's ready
+tf.ready().then(() => {
+  console.log("TensorFlow.js is ready!");
+}).catch(err => {
+  console.error("Error initializing TensorFlow.js:", err);
+});
+
 window.THREE = THREE;
 window.TrackballControls = TrackballControls;
 window.Stats = Stats;
