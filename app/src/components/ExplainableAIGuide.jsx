@@ -29,6 +29,16 @@ const ExplainableAIGuide = ({ onClose }) => {
               whether their recommendation makes sense for you.
             </p>
           </div>
+          
+          <div className="why-xai">
+            <h4>Why is Explainable AI important?</h4>
+            <ul className="importance-points">
+              <li><span className="point-icon">⚖️</span> <strong>Trust & Transparency</strong>: Users need to understand AI decisions for critical applications</li>
+              <li><span className="point-icon">🔍</span> <strong>Debugging</strong>: Developers can identify and fix biases or errors in models</li>
+              <li><span className="point-icon">🎓</span> <strong>Learning</strong>: Researchers can gain insights into how models work</li>
+              <li><span className="point-icon">📋</span> <strong>Compliance</strong>: Many industries require explainable decisions for regulatory purposes</li>
+            </ul>
+          </div>
         </div>
         
         <div className="guide-section">
@@ -49,6 +59,10 @@ const ExplainableAIGuide = ({ onClose }) => {
               <strong>How to interpret:</strong> Brighter areas (red/yellow) indicate regions 
               that strongly influenced the model's decision for the target class.
             </p>
+            <div className="use-case">
+              <span className="use-case-icon">🔍</span>
+              <p><strong>Best for:</strong> Locating the exact regions in the image that influenced a specific classification</p>
+            </div>
           </div>
           
           <div className="explanation-method">
@@ -66,6 +80,10 @@ const ExplainableAIGuide = ({ onClose }) => {
               <strong>How to interpret:</strong> Bright areas show pixels that have the greatest 
               influence on the model's output.
             </p>
+            <div className="use-case">
+              <span className="use-case-icon">🔍</span>
+              <p><strong>Best for:</strong> Identifying sensitive pixels that have maximum impact on classification</p>
+            </div>
           </div>
           
           <div className="explanation-method">
@@ -83,6 +101,10 @@ const ExplainableAIGuide = ({ onClose }) => {
               <strong>How to interpret:</strong> Red indicates positive contribution to the prediction, 
               blue indicates negative contribution.
             </p>
+            <div className="use-case">
+              <span className="use-case-icon">🧮</span>
+              <p><strong>Best for:</strong> Getting detailed attribution with theoretical guarantees about completeness</p>
+            </div>
           </div>
           
           <div className="explanation-method">
@@ -99,6 +121,10 @@ const ExplainableAIGuide = ({ onClose }) => {
               <strong>How to interpret:</strong> Green segments positively contribute to the classification, 
               while red segments negatively affect it.
             </p>
+            <div className="use-case">
+              <span className="use-case-icon">🧩</span>
+              <p><strong>Best for:</strong> Getting human-interpretable explanations that work with any model</p>
+            </div>
           </div>
           
           <div className="explanation-method">
@@ -115,6 +141,10 @@ const ExplainableAIGuide = ({ onClose }) => {
               <strong>How to interpret:</strong> Red areas push the prediction value higher, 
               blue areas push it lower. The intensity shows how strong the effect is.
             </p>
+            <div className="use-case">
+              <span className="use-case-icon">⚖️</span>
+              <p><strong>Best for:</strong> Getting mathematically fair attribution of feature importance</p>
+            </div>
           </div>
         </div>
         
@@ -123,13 +153,74 @@ const ExplainableAIGuide = ({ onClose }) => {
           <p>
             Each explanation method has different strengths and limitations:
           </p>
-          <ul className="methods-comparison">
-            <li><strong>Grad-CAM</strong> is fast and focuses on higher-level features, but may miss fine details</li>
-            <li><strong>Saliency Maps</strong> show pixel-level importance but can be noisy</li>
-            <li><strong>Integrated Gradients</strong> addresses gradient saturation issues but is computationally intensive</li>
-            <li><strong>LIME</strong> is model-agnostic but relies on sampling which introduces variability</li>
-            <li><strong>SHAP</strong> has strong theoretical guarantees but can be the slowest to compute</li>
-          </ul>
+          <div className="comparison-table">
+            <div className="table-header">
+              <div className="table-cell">Method</div>
+              <div className="table-cell">Speed</div>
+              <div className="table-cell">Accuracy</div>
+              <div className="table-cell">Interpretability</div>
+            </div>
+            <div className="table-row">
+              <div className="table-cell"><strong>Grad-CAM</strong></div>
+              <div className="table-cell">
+                <span className="performance-indicator high">Fast</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator medium">Medium</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator high">High</span>
+              </div>
+            </div>
+            <div className="table-row">
+              <div className="table-cell"><strong>Saliency Maps</strong></div>
+              <div className="table-cell">
+                <span className="performance-indicator high">Fast</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator low">Variable</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator medium">Medium</span>
+              </div>
+            </div>
+            <div className="table-row">
+              <div className="table-cell"><strong>Integrated Gradients</strong></div>
+              <div className="table-cell">
+                <span className="performance-indicator medium">Medium</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator high">High</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator medium">Medium</span>
+              </div>
+            </div>
+            <div className="table-row">
+              <div className="table-cell"><strong>LIME</strong></div>
+              <div className="table-cell">
+                <span className="performance-indicator low">Slow</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator medium">Medium</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator high">High</span>
+              </div>
+            </div>
+            <div className="table-row">
+              <div className="table-cell"><strong>SHAP</strong></div>
+              <div className="table-cell">
+                <span className="performance-indicator low">Slow</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator high">High</span>
+              </div>
+              <div className="table-cell">
+                <span className="performance-indicator high">High</span>
+              </div>
+            </div>
+          </div>
           <p>
             By comparing explanations from multiple methods, you can get a more complete picture of 
             how the model is making decisions.

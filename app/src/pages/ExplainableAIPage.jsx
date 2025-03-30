@@ -367,7 +367,10 @@ function ExplainableAIPage() {
           Understand what your neural network sees and how it makes decisions
           <button 
             className="show-guide-btn" 
-            onClick={() => setShowGuide(true)}
+            onClick={() => {
+              console.log("Guide button clicked, setting showGuide to true");
+              setShowGuide(true);
+            }}
             title="Open Explainable AI Guide"
           >
             ?
