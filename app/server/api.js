@@ -79,7 +79,13 @@ app.post('/api/process-image', upload.single('image'), (req, res) => {
       console.error(`Python script error: ${stderr}`);
     }
     
-    // Collect the generated visualization paths
+    // Extract just the numeric part of the filename for consistency
+    const numericId = baseFilename.replace('user-image-', '');
+    const simplifiedId = `xai_${numericId}`;
+    
+    console.log(`Using simplified ID for explanations: ${simplifiedId}`);
+    
+    // Collect the generated visualization paths with simplified naming
     const methods = {
       'gradcam': 'gr',
       'saliency': 'sa',
@@ -89,23 +95,23 @@ app.post('/api/process-image', upload.single('image'), (req, res) => {
     };
     
     const results = {};
-    const imageId = baseFilename;
     
-    // Check what files were actually generated
+    // Check what files were actually generated using the new format with "_input_"
     for (const [method, abbr] of Object.entries(methods)) {
-      const expectedFilePath = path.join(outputDir, `${imageId}_${abbr}.jpg`);
-      const publicPath = `/assets/images/explanations/${imageId}_${abbr}.jpg`;
+      const filePath = path.join(outputDir, `${simplifiedId}_input_${abbr}.jpg`);
+      const publicPath = `/assets/images/explanations/${simplifiedId}_input_${abbr}.jpg`;
       
-      if (fs.existsSync(expectedFilePath)) {
+      if (fs.existsSync(filePath)) {
+        console.log(`Found explanation file: ${filePath}`);
         results[method] = publicPath;
       } else {
-        console.warn(`Warning: Expected file not found: ${expectedFilePath}`);
+        console.warn(`Warning: Expected file not found: ${filePath}`);
       }
     }
     
     return res.json({
       success: true,
-      imageId: imageId,
+      imageId: simplifiedId, // Return the simplified ID
       explanations: results
     });
   });

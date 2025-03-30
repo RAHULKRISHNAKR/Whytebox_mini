@@ -279,43 +279,65 @@ def main():
     if args.output_dir:
         output_dir = args.output_dir
     else:
-        # Try to use the app's explanations directory if we're processing an uploaded image
+        # When processing an uploaded image, always save to public/assets/images/explanations
+        # This ensures consistency regardless of where the script is run from
         if 'uploads' in img_path:
-            output_dir = os.path.join(os.path.dirname(os.path.dirname(img_path)), "images", "explanations")
+            # Navigate to the explanations directory relative to the app root
+            app_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            output_dir = os.path.join(app_root, "public", "assets", "images", "explanations")
         else:
+            # For other images, use the directory where the script is located
             output_dir = os.path.dirname(img_path)
     
     # Create output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
-    # Get base filename for saving - extract just the name without extension
-    base_filename = os.path.splitext(os.path.basename(img_path))[0]
+    # Extract filename and clean it to prevent duplication
+    base_name = os.path.splitext(os.path.basename(img_path))[0]
     
-    # Generate and save all visualizations using consistent naming
+    # Remove any existing "xai_" prefix if present
+    if base_name.startswith('xai_'):
+        base_name = base_name[4:]  # Remove the "xai_" prefix
+    
+    # For uploaded images, extract just the numeric part if it's a user-image
+    if base_name.startswith('user-image-'):
+        # Extract just the timestamp/numeric part
+        base_name = base_name.split('user-image-')[1]
+    
+    # Remove any duplicate "_input" suffixes that might be present
+    if '_input' in base_name:
+        base_name = base_name.split('_input')[0]
+    
+    # Generate a clean base filename with just one prefix
+    base_filename = f"xai_{base_name}"
+    
+    print(f"Using base filename: {base_filename}")
+    
+    # Generate and save all visualizations using the correct format (without "_input_")
     # Grad-CAM
     target_layer = model.layer4[-1]
-    gradcam_path = os.path.join(output_dir, f"{base_filename}_gr.jpg") # Change to jpg for consistency
+    gradcam_path = os.path.join(output_dir, f"{base_filename}_gr.jpg")
     generate_gradcam(img_path, model, target_layer, device, gradcam_path)
     print(f"Grad-CAM saved: {gradcam_path}")
     
     # Saliency Map
-    saliency_path = os.path.join(output_dir, f"{base_filename}_sa.jpg") # Change to jpg
+    saliency_path = os.path.join(output_dir, f"{base_filename}_sa.jpg")
     generate_saliency_map(img_path, model, device, saliency_path)
     print(f"Saliency Map saved: {saliency_path}")
     
     # Integrated Gradients
-    ig_path = os.path.join(output_dir, f"{base_filename}_in.jpg") # Change to in.jpg
+    ig_path = os.path.join(output_dir, f"{base_filename}_in.jpg")
     generate_integrated_gradients(img_path, model, device, ig_path)
     print(f"Integrated Gradients saved: {ig_path}")
     
     # LIME
-    lime_path = os.path.join(output_dir, f"{base_filename}_li.jpg") # Change to li.jpg
+    lime_path = os.path.join(output_dir, f"{base_filename}_li.jpg")
     generate_lime(img_path, model, device, lime_path)
     print(f"LIME explanation saved: {lime_path}")
     
     # SHAP
-    shap_path = os.path.join(output_dir, f"{base_filename}_sh.jpg") # Change to sh.jpg
+    shap_path = os.path.join(output_dir, f"{base_filename}_sh.jpg")
     generate_shap(img_path, model, device, shap_path)
     print(f"SHAP explanation saved: {shap_path}")
     

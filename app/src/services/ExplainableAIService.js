@@ -28,28 +28,46 @@ class ExplainableAIService {
 
   /**
    * Get pre-generated visualization path for the specified method
-   * @param {string} imageName - Name of the input image (e.g., 'cat', 'dog')
+   * @param {string} imageName - Name of the input image (e.g., 'cat', 'dog', or 'xai_1234567890')
    * @param {string} method - Explanation method (gradcam, saliency, integrated, lime, shap)
    * @returns {Object} Object containing the image path and mock prediction data
    */
   getVisualization(imageName, method) {
-    // Convert method to abbreviation used in filenames
     const methodAbbr = this.getMethodAbbreviation(method);
     
-    // Create path to pre-generated image
-    const imagePath = `/assets/images/explanations/${imageName}_${methodAbbr}.jpg`;
-    console.log(`Using pre-generated explanation: ${imagePath}`);
+    // Use the filename format with "_input_"
+    const imagePath = `/assets/images/explanations/${imageName}_input_${methodAbbr}.jpg`;
     
-    // Return mock result in same format as original implementation expected
-    return {
-      overlay: imagePath,
-      heatmap: imagePath, // Same image used for both
-      prediction: {
-        class: 0, // Mock class ID
-        score: "95.00", // Mock confidence score
-        targetClass: 0 // Mock target class
-      }
-    };
+    console.log(`Looking for visualization at: ${imagePath}`);
+
+    // Verify the image path exists
+    return fetch(imagePath)
+      .then(response => {
+        if (response.ok) {
+          console.log(`Found visualization at: ${imagePath}`);
+          return {
+            overlay: imagePath,
+            heatmap: imagePath,
+            prediction: { class: 0, score: "95.00", targetClass: 0 }
+          };
+        }
+        
+        // If path fails, return error placeholder
+        console.error(`Image not found at path: ${imagePath}`);
+        return { 
+          overlay: '/assets/images/error-placeholder.jpg', 
+          heatmap: '/assets/images/error-placeholder.jpg', 
+          prediction: { class: null, score: "0.00", targetClass: null } 
+        };
+      })
+      .catch(err => {
+        console.error(`Error verifying image path: ${imagePath}`, err);
+        return { 
+          overlay: '/assets/images/error-placeholder.jpg', 
+          heatmap: '/assets/images/error-placeholder.jpg', 
+          prediction: { class: null, score: "0.00", targetClass: null } 
+        };
+      });
   }
   
   /**

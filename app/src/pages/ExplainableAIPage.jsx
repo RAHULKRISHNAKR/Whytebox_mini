@@ -190,8 +190,10 @@ function ExplainableAIPage() {
         
         const imageBase64 = await imagePromise;
         
+        // Update server endpoint to ensure correctness
+        const serverEndpoint = 'http://localhost:3001/api/explainable-ai';
         // Send the image to the API endpoint
-        const response = await fetch('http://localhost:3001/api/explainable-ai', {
+        const response = await fetch(serverEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -258,7 +260,19 @@ function ExplainableAIPage() {
         // Generate path to pre-generated image
         const methodAbbr = getMethodAbbreviation(activeMethod);
         const imagePath = `/assets/images/explanations/${selectedImage}_${methodAbbr}.jpg`;
-        
+
+        // Verify the image path exists
+        fetch(imagePath)
+          .then(response => {
+            if (!response.ok) {
+              console.error(`Image not found at path: ${imagePath}`);
+              throw new Error('Image not found');
+            }
+          })
+          .catch(err => {
+            console.error(`Error verifying image path: ${imagePath}`, err);
+          });
+
         // Simulate processing delay for better UX
         await new Promise(resolve => setTimeout(resolve, 300));
         
