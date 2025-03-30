@@ -72,6 +72,11 @@ def process_images(img_paths):
 
 if __name__ == "__main__":
     img_paths = [
-r"C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/zsample/cat.jpg"
+r"zsample\cat.jpg",
+r"zsample\dog.png",
+r"zsample\car.png",
+r"zsample\bird.png",
+r"zsample\goldfish.png",
+r"zsample\cardigan.png",
 ]  # Add as many images as you'd like
     process_images(img_paths)

@@ -31,7 +31,6 @@ const LoadingOverlay = ({ isLoading }) => {
   return (
     <div className="loading-overlay">
       <div className="loading-container">
-        <img src="/assets/loading.gif" alt="Loading..." className="loading-gif" />
         <div className="loading-bar">
           <div className="loading-progress"></div>
         </div>

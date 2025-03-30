@@ -15,36 +15,43 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
   useEffect(() => {
     const fetchSampleImages = async () => {
       try {
-        const sampleImages = [
-          { 
-            id: 1, 
-            name: 'Cat', 
-            path: 'assets/data/cat.png',
-            thumbnail: 'assets/data/cat.png',
-            jsonPath: 'assets/data/cat.json'
-          },
-          { 
-            id: 2, 
-            name: 'Dog', 
-            path: 'assets/data/dog.png',
-            thumbnail: 'assets/data/dog.png',
-            jsonPath: 'assets/data/dog.json'
-          },
-          { 
-            id: 3, 
-            name: 'Bird', 
-            path: 'assets/data/bird.png',
-            thumbnail: 'assets/data/bird.png',
-            jsonPath: 'assets/data/bird.json'
-          },
-          { 
-            id: 4, 
-            name: 'Car', 
-            path: 'assets/data/car.png',
-            thumbnail: 'assets/data/car.png',
-            jsonPath: 'assets/data/car.json'
-          }
-        ];
+      const sampleImages = [
+        { 
+        id: 1, 
+        name: 'Cat', 
+        path: 'assets/data/cat.png',
+        thumbnail: 'assets/data/cat.png',
+        jsonPath: 'assets/data/cat.json'
+        },
+        { 
+        id: 2, 
+        name: 'Dog', 
+        path: 'assets/data/dog.png',
+        thumbnail: 'assets/data/dog.png',
+        jsonPath: 'assets/data/dog.json'
+        },
+        { 
+        id: 3, 
+        name: 'Bird', 
+        path: 'assets/data/bird.png',
+        thumbnail: 'assets/data/bird.png',
+        jsonPath: 'assets/data/bird.json'
+        },
+        { 
+        id: 4, 
+        name: 'Car', 
+        path: 'assets/data/car.png',
+        thumbnail: 'assets/data/car.png',
+        jsonPath: 'assets/data/car.json'
+        },
+        { 
+        id: 5, 
+        name: 'Goldfish', 
+        path: 'assets/data/goldfish.png',
+        thumbnail: 'assets/data/goldfish.png',
+        jsonPath: 'assets/data/goldfish.json'
+        }
+      ];
 
         // Verify images exist
         await Promise.all(sampleImages.map(async (image) => {

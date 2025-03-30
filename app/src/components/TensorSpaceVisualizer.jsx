@@ -75,7 +75,7 @@ const TensorSpaceVisualizer = () => {
     setPrediction(null);
     setGradcamImage(null);
 
-    const gradcamPath = `/assets/data/${image.name}_GC.jpg`;
+    const gradcamPath = `/assets/data/${image.name.toLowerCase()}_GC.jpg`;
     const gradcamExists = await checkImageExists(gradcamPath);
     setGradcamImage(gradcamExists ? gradcamPath : null);
 
@@ -84,7 +84,7 @@ const TensorSpaceVisualizer = () => {
       Dog: "/assets/data/dog.json",
       Bird: "/assets/data/bird.json",
       Car: "/assets/data/car.json",
-      Coffeepot: "/assets/data/coffeepot.json",
+      Goldfish: "/assets/data/goldfish.json",
     }[image.name] || "/assets/data/image_topology.json";
 
     try {
@@ -354,7 +354,7 @@ const TensorSpaceVisualizer = () => {
                   .map((value, index) => ({ value, label: outputLabels[index] || `Class ${index}` }))
                   .sort((a, b) => b.value - a.value)
                   .slice(0, 5)
-                  .map(item => `${item.label}: ${(item.value * 100).toFixed(2)}%`)
+                  .map(item => `${item.label}: ${(item.value).toFixed(2)}%`)
                   .join(", ");
             
                 setPrediction(`Top predictions: ${top5}`);
