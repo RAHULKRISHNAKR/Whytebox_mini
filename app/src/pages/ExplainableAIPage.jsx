@@ -53,6 +53,11 @@ function ExplainableAIPage() {
     { id: 'car', name: 'Car', path: '/assets/data/car.png' }
   ];
   
+  // Add new state for custom image upload
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  
   // Load model and preload images when component mounts
   useEffect(() => {
     async function initialize() {
@@ -122,87 +127,144 @@ function ExplainableAIPage() {
     setSelectedClass(e.target.value);
   };
   
+  // Handle file upload
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Preview the selected image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadedImage({
+        file,
+        preview: reader.result,
+        id: 'custom',  // Use 'custom' as the ID for uploaded images
+        name: file.name
+      });
+      
+      // Automatically select the custom image
+      setSelectedImage('custom');
+      
+      // Reset visualizations when a new image is uploaded
+      setVisualizationResults({
+        gradcam: null,
+        saliency: null,
+        integrated: null,
+        lime: null,
+        shap: null
+      });
+      
+      setProcessingTimes({
+        gradcam: null,
+        saliency: null,
+        integrated: null,
+        lime: null,
+        shap: null
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+  
   // Generate visualization based on selected method and image
   const handleGenerateVisualization = async () => {
-    if (!selectedImage || !modelLoaded) return;
+    if (!modelLoaded) return;
     
     setLoading(true);
     
     try {
-      // Get the selected image element
-      const imageElement = imageElements.current[selectedImage];
-      if (!imageElement) {
-        throw new Error(`Image ${selectedImage} not loaded`);
-      }
-
-      // Set the class index if provided, otherwise null for top prediction
-      const classIndex = selectedClass ? parseInt(selectedClass) : null;
-      
-      const startTime = performance.now();
-      let visualization;
-      
-      // Call the appropriate method based on the active method
-      try {
-        switch (activeMethod) {
-          case 'gradcam':
-            visualization = await ExplainableAIService.generateGradCAM(imageElement, classIndex);
-            break;
-          case 'saliency':
-            visualization = await ExplainableAIService.generateSaliencyMap(imageElement, classIndex);
-            break;
-          case 'integrated':
-            visualization = await ExplainableAIService.generateIntegratedGradients(imageElement, classIndex);
-            break;
-          case 'lime':
-            visualization = await ExplainableAIService.generateLIME(imageElement, classIndex);
-            break;
-          case 'shap':
-            visualization = await ExplainableAIService.generateSHAP(imageElement, classIndex);
-            break;
-          default:
-            throw new Error(`Unknown method: ${activeMethod}`);
+      // For uploaded custom image, process through the API
+      if (selectedImage === 'custom' && uploadedImage) {
+        setIsUploading(true);
+        setUploadStatus('Uploading image and generating explanations...');
+        
+        const formData = new FormData();
+        formData.append('image', uploadedImage.file);
+        
+        const startTime = performance.now();
+        
+        // Send the image to the API for processing
+        const response = await fetch('http://localhost:3001/api/process-image', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to process image');
         }
-      } catch (methodError) {
-        console.error(`Error in ${activeMethod} method:`, methodError);
         
-        // Fall back to pre-generated samples for demo
-        const fallbackPath = `/assets/images/explanations/${selectedImage}_${activeMethod.substring(0, 2)}.jpg`;
-        console.log(`Falling back to sample image: ${fallbackPath}`);
+        const data = await response.json();
+        const endTime = performance.now();
+        const processingTime = (endTime - startTime).toFixed(2);
         
-        visualization = {
-          overlay: fallbackPath,
-          prediction: {
-            class: 0,
-            score: "95.00",
-            targetClass: 0
-          }
-        };
+        // Update the image ID to match what the server returned
+        setUploadedImage(prev => ({
+          ...prev,
+          id: data.imageId
+        }));
+        
+        // Update processing times and visualization results for all methods
+        const newProcessingTimes = { ...processingTimes };
+        const newVisualizationResults = { ...visualizationResults };
+        
+        Object.entries(data.explanations).forEach(([method, path]) => {
+          newProcessingTimes[method] = processingTime;
+          newVisualizationResults[method] = path;
+        });
+        
+        setProcessingTimes(newProcessingTimes);
+        setVisualizationResults(newVisualizationResults);
+        
+        setUploadStatus('Explanations generated successfully!');
+        console.log(`Generated explanations for custom image in ${processingTime}ms`);
+      } 
+      // For pre-existing images, use the pre-generated explanations
+      else {
+        const startTime = performance.now();
+        
+        // Generate path to pre-generated image
+        const methodAbbr = getMethodAbbreviation(activeMethod);
+        const imagePath = `/assets/images/explanations/${selectedImage}_${methodAbbr}.jpg`;
+        
+        // Simulate processing delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        const endTime = performance.now();
+        const processingTime = (endTime - startTime).toFixed(2);
+        
+        // Update processing time and visualization result
+        setProcessingTimes(prev => ({
+          ...prev,
+          [activeMethod]: processingTime
+        }));
+        
+        setVisualizationResults(prev => ({
+          ...prev,
+          [activeMethod]: imagePath
+        }));
+        
+        console.log(`Loaded ${activeMethod} visualization in ${processingTime}ms`);
       }
-      
-      const endTime = performance.now();
-      const processingTime = (endTime - startTime).toFixed(2);
-      
-      // Update processing time
-      setProcessingTimes(prev => ({
-        ...prev,
-        [activeMethod]: processingTime
-      }));
-      
-      // Update visualization result
-      setVisualizationResults(prev => ({
-        ...prev,
-        [activeMethod]: visualization.overlay
-      }));
-      
-      console.log(`Generated ${activeMethod} visualization in ${processingTime}ms`);
-      console.log('Prediction:', visualization.prediction);
-      
     } catch (error) {
-      console.error("Error generating visualization:", error);
-      alert(`Error generating visualization: ${error.message}`);
+      console.error("Error processing visualization:", error);
+      setUploadStatus(`Error: ${error.message}`);
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
+      setIsUploading(false);
     }
+  };
+  
+  // Helper function to get method abbreviation
+  const getMethodAbbreviation = (method) => {
+    const abbreviations = {
+      'gradcam': 'gr',
+      'saliency': 'sa',
+      'integrated': 'in',
+      'lime': 'li',
+      'shap': 'sh'
+    };
+    return abbreviations[method] || method.substring(0, 2);
   };
   
   // Toggle comparison mode
@@ -420,11 +482,34 @@ function ExplainableAIPage() {
           <div className="controls-panel">
             <div className="image-selector">
               <label>Select Image:</label>
-              <select value={selectedImage} onChange={handleImageSelect}>
+              <select 
+                value={selectedImage} 
+                onChange={handleImageSelect}
+                disabled={isUploading}
+              >
                 {images.map(img => (
                   <option key={img.id} value={img.id}>{img.name}</option>
                 ))}
+                {uploadedImage && (
+                  <option key="custom" value="custom">Custom: {uploadedImage.name}</option>
+                )}
               </select>
+              
+              {/* Add file upload input */}
+              <div className="file-upload">
+                <label htmlFor="image-upload" className="upload-btn">
+                  Upload Image
+                </label>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                  disabled={isUploading}
+                />
+                {uploadStatus && <div className="upload-status">{uploadStatus}</div>}
+              </div>
             </div>
             
             <div className="class-selector">

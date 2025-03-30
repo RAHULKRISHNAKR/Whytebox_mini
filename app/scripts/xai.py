@@ -279,10 +279,14 @@ def main():
     if args.output_dir:
         output_dir = args.output_dir
     else:
-        # Try to use the app's explanations directory if we're processing an uploaded image
+        # When processing an uploaded image, always save to public/assets/images/explanations
+        # This ensures consistency regardless of where the script is run from
         if 'uploads' in img_path:
-            output_dir = os.path.join(os.path.dirname(os.path.dirname(img_path)), "images", "explanations")
+            # Navigate to the explanations directory relative to the app root
+            app_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            output_dir = os.path.join(app_root, "public", "assets", "images", "explanations")
         else:
+            # For other images, use the directory where the script is located
             output_dir = os.path.dirname(img_path)
     
     # Create output directory if it doesn't exist
