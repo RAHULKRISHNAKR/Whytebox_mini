@@ -112,19 +112,23 @@ class MobileNetV1Visualization(Scene):
         self.wait(0.5)
         
         # Show network structure
-        self.play(FadeIn(nn))
+        self.play(Create(nn))
         self.wait(1)
         
         # Add captions
-        self.play(FadeIn(captions))
-        self.play(FadeIn(legend))
-        self.play(FadeIn(params_text))
+        self.play(Write(captions))
+        self.play(Write(legend))
+        
         self.wait(1)
 
         self.play(FadeOut(captions))
+        
+        self.play(Write(params_text))
+        
         self.play(FadeOut(legend))   
-        self.play(FadeOut(nn))
-        self.play(FadeOut(params_text))        
+        self.play(FadeOut(params_text))
+        self.play(FadeOut(nn))     
+        self.play(FadeOut(title))     
         
         # Show explanation of depthwise separable convolution
         self.play(FadeIn(dw_explanation))
