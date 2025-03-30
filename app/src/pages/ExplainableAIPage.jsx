@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as tf from "@tensorflow/tfjs";
 import Navigation from '../components/Navigation';
 import ExplainableAIService from '../services/ExplainableAIService';
 import ExplainableAIGuide from '../components/ExplainableAIGuide';
@@ -57,25 +58,25 @@ function ExplainableAIPage() {
     async function initialize() {
       try {
         setLoading(true);
+
         // Load model
         const success = await ExplainableAIService.loadModel('/assets/models/mobilenetv1/model.json');
         setModelLoaded(success);
-        
-        // Preload all sample images
+
+        // Preload images (existing logic)
         for (const img of images) {
           const imageElement = new Image();
-          imageElement.crossOrigin = "anonymous"; // Important for canvas operations
+          imageElement.crossOrigin = "anonymous";
           imageElement.src = img.path;
-          
-          // Wait for image to load
-          await new Promise(resolve => {
+
+          await new Promise((resolve) => {
             imageElement.onload = resolve;
             imageElement.onerror = () => {
               console.error(`Failed to load image: ${img.path}`);
               resolve();
             };
           });
-          
+
           imageElements.current[img.id] = imageElement;
         }
       } catch (error) {
@@ -84,8 +85,15 @@ function ExplainableAIPage() {
         setLoading(false);
       }
     }
-    
+
     initialize();
+
+    return () => {
+      // Clear TensorFlow.js backend to avoid duplicate variable registration
+      tf.disposeVariables();
+      tf.engine().reset();
+      console.log("ExplainableAIPage unmounted. TensorFlow.js backend reset.");
+    };
   }, []);
   
   // Handler for image selection
