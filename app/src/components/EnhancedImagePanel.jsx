@@ -10,6 +10,10 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('samples'); // 'samples' or 'upload'
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [processingStatus, setProcessingStatus] = useState("idle"); // idle, processing, success, error
   
   // Fetch sample images on component mount
   useEffect(() => {
@@ -79,28 +83,122 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
     });
   };
   
-  // Handle file upload - simplified
-  const handleFileUpload = (event) => {
+  // Handle file selection - now just for preview
+  const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) return;
     
+    // Clear any previous processing state
+    setUploadError(null);
+    setProcessingStatus("idle");
+    setSelectedFile(file);
+    
+    // Show a preview of the image
     const reader = new FileReader();
     reader.onload = (e) => {
       const imageObj = {
         id: Date.now(),
-        name: file.name,
+        name: file.name.split('.')[0], // Use filename without extension
         path: e.target.result,
         thumbnail: e.target.result,
-        isUploaded: true
+        isUploaded: true,
+        isProcessing: false
       };
       
       setSelectedImage(imageObj);
-      // Pass the uploaded image to parent
-      onSelectImage(imageObj);
     };
     
     reader.readAsDataURL(file);
   };
+  
+  // Separate process to handle the image processing
+  const processSelectedImage = async () => {
+    if (!selectedFile) return;
+    
+    setIsProcessing(true);
+    setProcessingStatus("processing");
+    setUploadError(null);
+    
+    // Update the image object to show processing state
+    if (selectedImage) {
+      const processingImageObj = {
+        ...selectedImage,
+        isProcessing: true
+      };
+      setSelectedImage(processingImageObj);
+    }
+    
+    try {
+      // Create a FormData object to send the file to the server
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+      
+      // Send the image to the server for processing
+      console.log("Sending image to server for processing...");
+      
+      // Use the full server URL to avoid proxy issues
+      const serverUrl = 'http://localhost:3001'; // Explicit server URL
+      const apiUrl = `${serverUrl}/api/process-image`;
+      console.log(`Submitting to: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      // Log response status for debugging
+      console.log("Server response status:", response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server error response:", errorText);
+        throw new Error(`Server error (${response.status}): ${response.statusText || 'Unknown error'}`);
+      }
+      
+      const data = await response.json();
+      console.log("Processing successful, received:", data);
+      
+      // Update the image object with the JSON file path
+      const processedImageObj = {
+        ...selectedImage,
+        jsonPath: data.jsonPath,
+        isProcessing: false
+      };
+      
+      setSelectedImage(processedImageObj);
+      setProcessingStatus("success");
+      
+      // Don't automatically pass to the parent yet - let user click the visualize button
+      
+    } catch (error) {
+      console.error('Error processing image:', error);
+      setUploadError(`${error.message}. Make sure the server is running on port 3001.`);
+      
+      // Still set the image but mark it as having an error
+      if (selectedImage) {
+        const errorImageObj = {
+          ...selectedImage,
+          isProcessing: false,
+          hasError: true
+        };
+        
+        setSelectedImage(errorImageObj);
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  // Separate visualization function for processed uploaded images
+  const visualizeProcessedImage = () => {
+    if (!selectedImage || !selectedImage.jsonPath) return;
+    
+    // Pass the processed image to parent component
+    onSelectImage(selectedImage);
+  };
+  
+  // Replace the handleFileUpload function with the simplified one
+  const handleFileUpload = handleFileSelect;
   
   return (
     <div className="image-panel" style={{
@@ -191,11 +289,19 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
               onChange={handleFileUpload}
               style={{ display: 'none' }}
               id="image-upload"
+              disabled={isProcessing}
             />
-            <label htmlFor="image-upload" className="select-image-btn">
-              Select Image
+            <label htmlFor="image-upload" className={`select-image-btn ${isProcessing ? 'disabled' : ''}`}>
+              {isProcessing ? 'Processing...' : 'Select Image'}
             </label>
           </div>
+          
+          {uploadError && (
+            <div className="upload-error">
+              <p>Error: {uploadError}</p>
+              <p>Please try a different image.</p>
+            </div>
+          )}
           
           {selectedImage?.isUploaded && (
             <div className="selected-image-container">
@@ -204,17 +310,73 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
                 <img src={selectedImage.path} alt={selectedImage.name} />
               </div>
               <p>{selectedImage.name}</p>
+              
+              {/* Processing status indicators */}
+              {isProcessing && (
+                <div className="processing-indicator">
+                  <span className="spinner"></span>
+                  <p>Converting image...</p>
+                </div>
+              )}
+              
+              {selectedImage.hasError && (
+                <p className="processing-error">Failed to process image</p>
+              )}
+              
+              {/* Show process button if we have a selected file but haven't processed it yet */}
+              {selectedFile && processingStatus === "idle" && (
+                <button 
+                  onClick={processSelectedImage}
+                  className="process-btn"
+                  disabled={isProcessing}
+                >
+                  Process Image
+                </button>
+              )}
+              
+              {/* Show processing status */}
+              {processingStatus === "processing" && (
+                <p className="processing-status">Processing image...</p>
+              )}
+              
+              {processingStatus === "success" && (
+                <div className="success-message">
+                  <p>✓ Image processed successfully!</p>
+                  <button 
+                    onClick={visualizeProcessedImage}
+                    className="visualize-btn"
+                  >
+                    Visualize Now
+                  </button>
+                </div>
+              )}
+              
+              {processingStatus === "error" && (
+                <div className="error-message">
+                  <p>Failed to process image. Please try another one.</p>
+                  <button 
+                    onClick={processSelectedImage}
+                    className="retry-btn"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {selectedImage && (
+      {/* For sample images or already processed uploaded images */}
+      {selectedImage && 
+       !selectedImage.isProcessing && 
+       !selectedImage.hasError && 
+       (activeTab === 'samples' || (activeTab === 'upload' && processingStatus !== 'idle' && processingStatus !== 'processing')) && (
         <div className="image-action-container">
           <p>Selected: <strong>{selectedImage.name}</strong></p>
           <button
-            onClick={() => handleImageClick(selectedImage)}
-            disabled={isLoading}
+            onClick={() => activeTab === 'samples' ? handleImageClick(selectedImage) : visualizeProcessedImage()}
+            disabled={isLoading || isProcessing}
             className="visualize-btn"
           >
             {isLoading ? 'Processing...' : 'Visualize with this image'}

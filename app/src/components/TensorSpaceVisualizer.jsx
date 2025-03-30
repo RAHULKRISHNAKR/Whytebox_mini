@@ -84,20 +84,40 @@ const TensorSpaceVisualizer = () => {
     setPrediction(null);
     setGradcamImage(null);
 
-    const gradcamPath = `/assets/data/${image.name.toLowerCase()}_GC.jpg`;
-    const gradcamExists = await checkImageExists(gradcamPath);
-    setGradcamImage(gradcamExists ? gradcamPath : null);
+    // Check for GradCAM image availability
+    let gradcamPath;
+    if (image.isUploaded) {
+      // For uploaded images, there might not be a GradCAM yet
+      gradcamPath = null;
+    } else {
+      // For sample images, look for the GradCAM image
+      gradcamPath = `/assets/data/${image.name.toLowerCase()}_GC.jpg`;
+      const gradcamExists = await checkImageExists(gradcamPath);
+      gradcamPath = gradcamExists ? gradcamPath : null;
+    }
+    setGradcamImage(gradcamPath);
 
-    const jsonFilePath = {
-      Cat: "/assets/data/cat.json",
-      Dog: "/assets/data/dog.json",
-      Bird: "/assets/data/bird.json",
-      Car: "/assets/data/car.json",
-      Goldfish: "/assets/data/goldfish.json",
-    }[image.name] || "/assets/data/image_topology.json";
+    // Determine JSON file path
+    let jsonFilePath;
+    if (image.jsonPath) {
+      // Use the provided JSON path if available (from uploaded images)
+      jsonFilePath = image.jsonPath;
+    } else {
+      // For sample images, use the predefined paths
+      jsonFilePath = {
+        Cat: "/assets/data/cat.json",
+        Dog: "/assets/data/dog.json",
+        Bird: "/assets/data/bird.json",
+        Car: "/assets/data/car.json",
+        Goldfish: "/assets/data/goldfish.json",
+      }[image.name] || "/assets/data/image_topology.json";
+    }
 
     try {
       const response = await fetch(jsonFilePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image data: ${response.status}`);
+      }
       const imageData = await response.json();
       
       // Execute prediction

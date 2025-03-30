@@ -139,7 +139,8 @@ function ExplainableAIPage() {
         file,
         preview: reader.result,
         id: 'custom',  // Use 'custom' as the ID for uploaded images
-        name: file.name
+        name: file.name,
+        path: reader.result,  // Store the data URL as the path for preview
       });
       
       // Automatically select the custom image
@@ -177,15 +178,27 @@ function ExplainableAIPage() {
         setIsUploading(true);
         setUploadStatus('Uploading image and generating explanations...');
         
-        const formData = new FormData();
-        formData.append('image', uploadedImage.file);
-        
         const startTime = performance.now();
         
-        // Send the image to the API for processing
-        const response = await fetch('http://localhost:3001/api/process-image', {
+        // Create base64 representation of the image for the explainable AI endpoint
+        const reader = new FileReader();
+        const imagePromise = new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(uploadedImage.file);
+        });
+        
+        const imageBase64 = await imagePromise;
+        
+        // Send the image to the API endpoint
+        const response = await fetch('http://localhost:3001/api/explainable-ai', {
           method: 'POST',
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            image: imageBase64,
+          }),
         });
         
         if (!response.ok) {
@@ -194,6 +207,8 @@ function ExplainableAIPage() {
         }
         
         const data = await response.json();
+        console.log("API response:", data); // Log the response for debugging
+        
         const endTime = performance.now();
         const processingTime = (endTime - startTime).toFixed(2);
         
@@ -207,16 +222,34 @@ function ExplainableAIPage() {
         const newProcessingTimes = { ...processingTimes };
         const newVisualizationResults = { ...visualizationResults };
         
-        Object.entries(data.explanations).forEach(([method, path]) => {
-          newProcessingTimes[method] = processingTime;
-          newVisualizationResults[method] = path;
-        });
+        // Add safety check for explanations object
+        if (data.explanations && typeof data.explanations === 'object') {
+          Object.entries(data.explanations).forEach(([method, path]) => {
+            console.log(`Setting visualization for ${method}: ${path}`);
+            // Ensure the path starts with a leading slash if needed
+            const fixedPath = path.startsWith('/') ? path : `/${path}`;
+            newProcessingTimes[method] = processingTime;
+            newVisualizationResults[method] = fixedPath;
+          });
+        } else {
+          console.warn('No explanations returned from the API', data);
+          throw new Error('No explanations generated. Please try a different image.');
+        }
         
         setProcessingTimes(newProcessingTimes);
         setVisualizationResults(newVisualizationResults);
         
         setUploadStatus('Explanations generated successfully!');
         console.log(`Generated explanations for custom image in ${processingTime}ms`);
+        
+        // Set the active method to one that was successfully generated (if current one wasn't)
+        if (!newVisualizationResults[activeMethod]) {
+          const generatedMethod = Object.keys(data.explanations)[0];
+          if (generatedMethod) {
+            setActiveMethod(generatedMethod);
+            console.log(`Switching to method ${generatedMethod} which was successfully generated`);
+          }
+        }
       } 
       // For pre-existing images, use the pre-generated explanations
       else {
@@ -305,6 +338,23 @@ function ExplainableAIPage() {
     });
   };
   
+  // Helper function to debug image loading issues
+  const handleImageError = (method, path) => {
+    console.error(`Failed to load ${method} image from path: ${path}`);
+    console.error(`Full URL would be: ${window.location.origin}${path}`);
+    
+    // Try to fetch the image directly to check response
+    fetch(path)
+      .then(response => {
+        console.log(`Fetch response for ${path}:`, response.status, response.ok ? 'OK' : 'Failed');
+      })
+      .catch(err => {
+        console.error(`Fetch error for ${path}:`, err);
+      });
+      
+    return `/assets/images/error-placeholder.jpg`;
+  };
+
   return (
     <div className="explainable-ai-container">
       <Navigation />
@@ -441,6 +491,10 @@ function ExplainableAIPage() {
                       src={visualizationResults[activeMethod]} 
                       alt={`${activeMethod} visualization`} 
                       className="visualization-image"
+                      onError={(e) => {
+                        e.target.src = handleImageError(activeMethod, visualizationResults[activeMethod]);
+                        e.target.alt = 'Error loading image';
+                      }}
                     />
                   ) : (
                     <div className="empty-visualization">
@@ -456,6 +510,10 @@ function ExplainableAIPage() {
                       src={visualizationResults[comparisonMethod]} 
                       alt={`${comparisonMethod} visualization`} 
                       className="visualization-image"
+                      onError={(e) => {
+                        e.target.src = handleImageError(comparisonMethod, visualizationResults[comparisonMethod]);
+                        e.target.alt = 'Error loading image';
+                      }}
                     />
                   ) : (
                     <div className="empty-visualization">
@@ -470,6 +528,10 @@ function ExplainableAIPage() {
                 src={visualizationResults[activeMethod]} 
                 alt={`${activeMethod} visualization`} 
                 className="visualization-image"
+                onError={(e) => {
+                  e.target.src = handleImageError(activeMethod, visualizationResults[activeMethod]);
+                  e.target.alt = 'Error loading image';
+                }}
               />
             ) : (
               // Empty state
@@ -579,11 +641,11 @@ function ExplainableAIPage() {
             <p>{getInterpretationGuide(activeMethod)}</p>
           </div>
           
-          {selectedImage && visualizationResults[activeMethod] && (
+          {selectedImage && (visualizationResults[activeMethod] || selectedImage === 'custom') && (
             <div className="original-image">
               <h4>Original Image</h4>
               <img 
-                src={images.find(img => img.id === selectedImage)?.path} 
+                src={selectedImage === 'custom' ? uploadedImage?.path : images.find(img => img.id === selectedImage)?.path} 
                 alt="Original input" 
                 className="original-image-preview"
               />

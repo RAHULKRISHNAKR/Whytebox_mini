@@ -1,0 +1,53 @@
+<!-- This is just to generate the error placeholder image - it's temporary and won't be used directly -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Error Placeholder</title>
+  <style>
+    canvas {
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="errorCanvas" width="400" height="300"></canvas>
+  <script>
+    // Create error placeholder image
+    const canvas = document.getElementById('errorCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Fill background
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw border
+    ctx.strokeStyle = '#8e9aff';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+    
+    // Add text
+    ctx.fillStyle = '#e0e0e0';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Image Failed to Load', canvas.width/2, 120);
+    
+    ctx.font = '16px Arial';
+    ctx.fillText('Check console for error details', canvas.width/2, 160);
+    
+    // Warning icon
+    ctx.beginPath();
+    ctx.fillStyle = '#ffcc00';
+    ctx.moveTo(canvas.width/2, 70);
+    ctx.lineTo(canvas.width/2 - 25, 100);
+    ctx.lineTo(canvas.width/2 + 25, 100);
+    ctx.fill();
+    
+    ctx.fillStyle = '#1a1a2e';
+    ctx.font = 'bold 20px Arial';
+    ctx.fillText('!', canvas.width/2, 93);
+    
+    // Export the canvas as an image
+    console.log("Right-click on the canvas and choose 'Save Image As' to save the error placeholder");
+  </script>
+</body>
+</html>
