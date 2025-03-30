@@ -272,7 +272,7 @@ def main():
     if args.image_path:
         img_path = args.image_path
     else:
-        img_path = "C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/zsample/car.png"
+        img_path = "C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/zsample/dog.jpg"
     
     # Get base filename for saving
     base_filename = os.path.splitext(os.path.basename(img_path))[0]
