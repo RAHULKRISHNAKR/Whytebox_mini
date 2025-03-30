@@ -23,15 +23,15 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
         { 
         id: 1, 
         name: 'Cat', 
-        path: 'assets/data/cat.png',
-        thumbnail: 'assets/data/cat.png',
+        path: 'assets/data/cat.jpg',
+        thumbnail: 'assets/data/cat.jpg',
         jsonPath: 'assets/data/cat.json'
         },
         { 
         id: 2, 
         name: 'Dog', 
-        path: 'assets/data/dog.png',
-        thumbnail: 'assets/data/dog.png',
+        path: 'assets/data/dog.jpg',
+        thumbnail: 'assets/data/dog.jpg',
         jsonPath: 'assets/data/dog.json'
         },
         { 
@@ -44,9 +44,9 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
         { 
         id: 4, 
         name: 'Car', 
-        path: 'assets/data/car.png',
-        thumbnail: 'assets/data/car.png',
-        jsonPath: 'assets/data/car.json'
+        path: 'assets/data/car1.png',
+        thumbnail: 'assets/data/car1.png',
+        jsonPath: 'assets/data/car1.json'
         },
         { 
         id: 5, 

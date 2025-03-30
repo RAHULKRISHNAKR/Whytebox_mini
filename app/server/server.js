@@ -6,7 +6,7 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Enable CORS with more specific options
 app.use(cors({
