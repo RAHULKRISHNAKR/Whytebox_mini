@@ -127,13 +127,14 @@ function HomePage() {
         </div>
       </div>
       
-      {/* Add Explainable AI feature card after the visualization preview section */}
+      {/* Enhanced Explainable AI feature section */}
       <div className="explainable-ai-preview">
         <div className="preview-content">
           <h2>Understand Your Model's Decisions</h2>
-          <p>
+          <p className="feature-description">
             Our Explainable AI tools help you look inside the "black box" of neural networks. 
             See what features influence predictions and why the model makes certain decisions.
+            Gain insights into model behavior with five powerful visualization techniques.
           </p>
           
           <div className="xai-techniques">
@@ -141,18 +142,59 @@ function HomePage() {
               <div className="technique-icon">🔍</div>
               <h3>Grad-CAM</h3>
               <p>Highlights regions of input that activate specific classes</p>
+              <div className="technique-highlight">Class-specific and computationally efficient</div>
+            </div>
+            
+            <div className="technique-card">
+              <div className="technique-icon">�밝</div>
+              <h3>Saliency Maps</h3>
+              <p>Shows which pixels have the greatest effect on predictions</p>
+              <div className="technique-highlight">Pixel-level feature importance</div>
+            </div>
+            
+            <div className="technique-card">
+              <div className="technique-icon">➕</div>
+              <h3>Integrated Gradients</h3>
+              <p>Attributes predictions to input features with theoretical guarantees</p>
+              <div className="technique-highlight">Addresses gradient saturation issues</div>
             </div>
             
             <div className="technique-card">
               <div className="technique-icon">📊</div>
               <h3>LIME</h3>
               <p>Explains predictions by approximating the model locally</p>
+              <div className="technique-highlight">Model-agnostic approach</div>
             </div>
             
             <div className="technique-card">
               <div className="technique-icon">🧮</div>
               <h3>SHAP</h3>
               <p>Calculates feature importance using game theory principles</p>
+              <div className="technique-highlight">Fair and consistent attribution</div>
+            </div>
+          </div>
+          
+          <div className="benefits-callout">
+            <div className="benefit-item">
+              <span className="benefit-icon">🔍</span>
+              <div className="benefit-content">
+                <h4>Enhanced Understanding</h4>
+                <p>Visualize exactly which parts of an image influence predictions</p>
+              </div>
+            </div>
+            <div className="benefit-item">
+              <span className="benefit-icon">⚙️</span>
+              <div className="benefit-content">
+                <h4>Model Debugging</h4>
+                <p>Identify why models make mistakes and how to improve them</p>
+              </div>
+            </div>
+            <div className="benefit-item">
+              <span className="benefit-icon">🔄</span>
+              <div className="benefit-content">
+                <h4>Compare Methods</h4>
+                <p>See the differences between explanation techniques side-by-side</p>
+              </div>
             </div>
           </div>
           
@@ -166,8 +208,13 @@ function HomePage() {
         </div>
         <div className="preview-image">
           <img src="/assets/images/explainable-ai-preview.jpg" alt="Explainable AI visualization" />
+          <div className="technique-labels">
+            <span className="technique-label" style={{top: '15%', left: '10%'}}>Grad-CAM</span>
+            <span className="technique-label" style={{top: '35%', left: '70%'}}>LIME</span>
+            <span className="technique-label" style={{top: '65%', left: '20%'}}>SHAP</span>
+          </div>
           <div className="preview-caption">
-            Visualization showing which parts of an image influence the model's prediction
+            Visualizations showing which parts of an image influence the model's prediction
           </div>
         </div>
       </div>

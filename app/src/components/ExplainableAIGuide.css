@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999; /* Increase this value */
   padding: 20px;
   backdrop-filter: blur(5px);
 }
@@ -24,6 +24,23 @@
   border: 1px solid #2a2a3a;
   color: #e0e0e0;
   position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #8e9aff #1a1a2e;
+}
+
+/* Custom scrollbar for webkit browsers */
+.guide-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.guide-content::-webkit-scrollbar-track {
+  background: #1a1a2e;
+  border-radius: 10px;
+}
+
+.guide-content::-webkit-scrollbar-thumb {
+  background: #8e9aff;
+  border-radius: 10px;
 }
 
 .guide-header {
@@ -39,6 +56,16 @@
   color: #8e9aff;
   margin-top: 0;
   font-size: 1.8rem;
+  background: linear-gradient(90deg, #8e9aff, #a777e3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 8s linear infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .explainable-ai-guide h3 {
@@ -55,8 +82,8 @@
   position: absolute;
   left: 0;
   bottom: -8px;
-  width: 30px;
-  height: 2px;
+  width: 40px;
+  height: 3px;
   background: linear-gradient(to right, #8e9aff, transparent);
 }
 
@@ -146,6 +173,18 @@
   margin-bottom: 25px;
   border: 1px solid #2a2a3a;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.explanation-method::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to bottom, #8e9aff, #a777e3);
 }
 
 .explanation-method:hover {
@@ -160,12 +199,18 @@
   padding: 15px;
   border-radius: 8px;
   text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .method-example img {
   max-width: 100%;
   border-radius: 5px;
   border: 1px solid #2a2a3a;
+  transition: transform 0.3s ease;
+}
+
+.method-example:hover img {
+  transform: scale(1.02);
 }
 
 .caption {
@@ -215,11 +260,136 @@
   margin-left: 10px;
 }
 
+/* New styles for the enhanced guide */
+.why-xai {
+  background-color: rgba(142, 154, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid rgba(142, 154, 255, 0.2);
+}
+
+.importance-points {
+  list-style-type: none;
+  padding: 0;
+  margin: 15px 0 0 0;
+}
+
+.importance-points li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.importance-points li:hover {
+  transform: translateX(5px);
+  background: rgba(26, 26, 46, 0.8);
+}
+
+.point-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+  display: inline-block;
+  min-width: 24px;
+}
+
+.use-case {
+  display: flex;
+  align-items: center;
+  background-color: rgba(26, 26, 46, 0.7);
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.use-case p {
+  margin: 0;
+}
+
+.use-case-icon {
+  font-size: 1.2rem;
+  margin-right: 10px;
+}
+
+/* Comparison table */
+.comparison-table {
+  width: 100%;
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.table-header {
+  display: flex;
+  background-color: #8e9aff;
+  color: #121212;
+  font-weight: bold;
+}
+
+.table-row {
+  display: flex;
+  background-color: #1a1a2e;
+  border-bottom: 1px solid #2a2a3a;
+  transition: background-color 0.2s ease;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background-color: #242440;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 12px 15px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-cell:first-child {
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.performance-indicator {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.performance-indicator.high {
+  background-color: rgba(39, 174, 96, 0.2);
+  color: #27ae60;
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.performance-indicator.medium {
+  background-color: rgba(243, 156, 18, 0.2);
+  color: #f39c12;
+  border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.performance-indicator.low {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .guide-content {
     padding: 25px;
-    max-width: 90%;
+    max-width: 95%;
   }
   
   .explainable-ai-guide h2 {
@@ -232,5 +402,30 @@
   
   .explainable-ai-guide h4 {
     font-size: 1.15rem;
+  }
+  
+  .comparison-table {
+    font-size: 0.9rem;
+  }
+  
+  .table-cell {
+    padding: 10px 8px;
+  }
+  
+  .performance-indicator {
+    padding: 3px 6px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-cell {
+    padding: 8px 5px;
+    font-size: 0.8rem;
+  }
+  
+  .performance-indicator {
+    padding: 2px 4px;
+    font-size: 0.75rem;
   }
 }
