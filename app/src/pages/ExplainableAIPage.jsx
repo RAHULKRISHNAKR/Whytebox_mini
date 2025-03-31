@@ -191,7 +191,7 @@ function ExplainableAIPage() {
         const imageBase64 = await imagePromise;
         
         // Update server endpoint to ensure correctness
-        const serverEndpoint = 'http://localhost:3001/api/explainable-ai';
+        const serverEndpoint = '/api/explainable-ai';
         // Send the image to the API endpoint
         const response = await fetch(serverEndpoint, {
           method: 'POST',

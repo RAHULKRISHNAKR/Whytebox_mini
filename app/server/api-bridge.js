@@ -18,7 +18,9 @@ const PORT = process.env.PORT || 3001;
 // ===== Middleware =====
 // Enable CORS with specific options
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-app-name.onrender.com'] // Add your production domain
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
   methods: ['GET', 'POST'],
   credentials: true
 }));

@@ -136,7 +136,7 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
       // Send the image to the server for processing
       console.log("Sending image to server for processing...");
       
-      // Use the full server URL to avoid proxy issues
+      // Use relative URLs instead of hardcoded localhost
       const serverUrl = 'http://localhost:3001'; // Explicit server URL
       const apiUrl = `${serverUrl}/api/process-image`;
       console.log(`Submitting to: ${apiUrl}`);

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: whytebox
+    env: node
+    buildCommand: bash ./build-script.sh
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    staticPublishPath: ./app/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

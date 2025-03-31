@@ -8,6 +8,7 @@
     "start": "node app/server/api-bridge.js",
     "start:server": "node app/server/server.js",
     "start:api": "node app/server/api.js",
-    "dev": "nodemon app/server/api-bridge.js"
+    "dev": "nodemon app/server/api-bridge.js",
+    "build": "cd app && npm install && npm run build"
   }
 }
