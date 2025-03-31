@@ -108,7 +108,7 @@ const TensorSpaceVisualizer = () => {
         Cat: "/assets/data/cat.json",
         Dog: "/assets/data/dog.json",
         Bird: "/assets/data/bird.json",
-        Car: "/assets/data/car.json",
+        Car: "/assets/data/car1.json",
         Goldfish: "/assets/data/goldfish.json",
       }[image.name] || "/assets/data/image_topology.json";
     }

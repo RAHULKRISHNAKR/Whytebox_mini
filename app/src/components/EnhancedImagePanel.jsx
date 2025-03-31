@@ -44,9 +44,9 @@ const EnhancedImagePanel = ({ isOpen, onSelectImage, gradcamImage, topOffset = "
         { 
         id: 4, 
         name: 'Car', 
-        path: 'assets/data/car.png',
-        thumbnail: 'assets/data/car.png',
-        jsonPath: 'assets/data/car.json'
+        path: 'assets/data/car1.png',
+        thumbnail: 'assets/data/car1.png',
+        jsonPath: 'assets/data/car1.json'
         },
         { 
         id: 5, 

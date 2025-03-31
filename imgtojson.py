@@ -5,7 +5,7 @@ import os
 import sys
 
 # Directory to save JSON files - use absolute path as specified
-output_dir = r"C:/Users/rahul/OneDrive/Documents/GitHub/Whytebox2.0/app/public/assets/data"
+output_dir = r"app\public\assets\data"
 os.makedirs(output_dir, exist_ok=True)
 
 # ImageNet means for normalization
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     else:
         # Default behavior: process the list of images
         image_paths = [
-            r"zsample/dog.jpg",
+            r"zsample/car2.png",
             # Add more default images if needed
         ]
         

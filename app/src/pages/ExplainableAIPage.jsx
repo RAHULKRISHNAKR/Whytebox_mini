@@ -47,10 +47,10 @@ function ExplainableAIPage() {
   
   // Sample images from TensorSpace model
   const images = [
-    { id: 'cat', name: 'Cat', path: '/assets/data/cat.png' },
-    { id: 'dog', name: 'Dog', path: '/assets/data/dog.png' },
+    { id: 'cat', name: 'Cat', path: '/assets/data/cat.jpg' },
+    { id: 'dog', name: 'Dog', path: '/assets/data/dog.jpg' },
     { id: 'bird', name: 'Bird', path: '/assets/data/bird.png' },
-    { id: 'car', name: 'Car', path: '/assets/data/car.png' }
+    { id: 'car', name: 'Car', path: '/assets/data/car1.png' }
   ];
   
   // Add new state for custom image upload

@@ -177,7 +177,7 @@ app.post('/api/explainable-ai', (req, res) => {
     
     // Generate a unique ID for this image
     const imageId = `xai_${Date.now()}`;
-    const imagePath = path.join(outputDir, `${imageId}_input.jpg`);
+    const imagePath = path.join(outputDir, `${imageId}.jpg`);
     
     // Save the base64 image data as a file
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
